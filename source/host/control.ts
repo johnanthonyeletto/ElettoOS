@@ -86,7 +86,7 @@ module TSOS {
             (<HTMLButtonElement>document.getElementById("btnHaltOS")).disabled = false;
             (<HTMLButtonElement>document.getElementById("btnReset")).disabled = false;
 
-            (document.getElementById("systemStatusIndicator").innerHTML = "John Eletto Made Me.");
+            (document.getElementById("systemStatusIndicator").innerHTML = " Running.");
 
             // .. set focus on the OS console display ...
             document.getElementById("display").focus();
@@ -105,6 +105,9 @@ module TSOS {
         public static hostBtnHaltOS_click(btn): void {
             Control.hostLog("Emergency halt", "host");
             Control.hostLog("Attempting Kernel shutdown.", "host");
+
+            (document.getElementById("systemStatusIndicator").innerHTML = " OS Halted.");
+
             // Call the OS shutdown routine.
             _Kernel.krnShutdown();
             // Stop the interval that's simulating our clock pulse.

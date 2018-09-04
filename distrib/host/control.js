@@ -71,7 +71,7 @@ var TSOS;
             // .. enable the Halt and Reset buttons ...
             document.getElementById("btnHaltOS").disabled = false;
             document.getElementById("btnReset").disabled = false;
-            (document.getElementById("systemStatusIndicator").innerHTML = "John Eletto Made Me.");
+            (document.getElementById("systemStatusIndicator").innerHTML = " Running.");
             // .. set focus on the OS console display ...
             document.getElementById("display").focus();
             // ... Create and initialize the CPU (because it's part of the hardware)  ...
@@ -86,6 +86,7 @@ var TSOS;
         Control.hostBtnHaltOS_click = function (btn) {
             Control.hostLog("Emergency halt", "host");
             Control.hostLog("Attempting Kernel shutdown.", "host");
+            (document.getElementById("systemStatusIndicator").innerHTML = " OS Halted.");
             // Call the OS shutdown routine.
             _Kernel.krnShutdown();
             // Stop the interval that's simulating our clock pulse.

@@ -97,6 +97,12 @@ module TSOS {
                 "<on | off> - Turns sarcastic mode on or off.");
             this.commandList[this.commandList.length] = sc;
 
+            // status <string>
+            sc = new ShellCommand(this.shellStatus,
+                "status",
+                "<string> - Changes current status of OS.");
+            this.commandList[this.commandList.length] = sc;
+
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
 
@@ -364,5 +370,17 @@ module TSOS {
             }
         }
 
+        public shellStatus(args) {
+            if (args.length > 0) {
+                var statusIndicator = document.getElementById("systemStatusIndicator");
+                (statusIndicator.innerHTML = "");
+                for (var i = 0; i < args.length; i++) {
+                    (statusIndicator.innerHTML += " " + args[i]);
+                }
+            }
+            else {
+                _StdOut.putText("Usage: status <string>  Please supply a new status.");
+            }
+        }
     }
 }

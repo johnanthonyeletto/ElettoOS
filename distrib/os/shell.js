@@ -77,6 +77,9 @@ var TSOS;
             // sarcastic <on | off>
             sc = new TSOS.ShellCommand(this.shellSarcastic, "sarcastic", "<on | off> - Turns sarcastic mode on or off.");
             this.commandList[this.commandList.length] = sc;
+            // status <string>
+            sc = new TSOS.ShellCommand(this.shellStatus, "status", "<string> - Changes current status of OS.");
+            this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
             //
@@ -307,6 +310,18 @@ var TSOS;
             }
             else {
                 _StdOut.putText("Usage: toggleSarcasticMode <on | off>  Please supply <on | off>.");
+            }
+        };
+        Shell.prototype.shellStatus = function (args) {
+            if (args.length > 0) {
+                var statusIndicator = document.getElementById("systemStatusIndicator");
+                (statusIndicator.innerHTML = "");
+                for (var i = 0; i < args.length; i++) {
+                    (statusIndicator.innerHTML += " " + args[i]);
+                }
+            }
+            else {
+                _StdOut.putText("Usage: status <string>  Please supply a new status.");
             }
         };
         return Shell;
