@@ -20,6 +20,24 @@ var TSOS;
             this.commandList = [];
             this.curses = "[fuvg],[cvff],[shpx],[phag],[pbpxfhpxre],[zbgureshpxre],[gvgf]";
             this.apologies = "[sorry]";
+            this.shellWhereAmI = function (args) {
+                if (args.length > 0) {
+                    _StdOut.putText("Usage: whereami  whereami does not take any args.");
+                }
+                else {
+                    if (navigator.geolocation && _SarcasticMode) {
+                        _StdOut.putText("Locating...");
+                        navigator.geolocation.getCurrentPosition(function (position) {
+                            _StdOut.putText("(" + position.coords.latitude + ", " + position.coords.longitude + ")." + " I'm watching you.");
+                        }, function (error) {
+                            _StdOut.putText("Who Knows?");
+                        });
+                    }
+                    else {
+                        _StdOut.putText("Who Knows?");
+                    }
+                }
+            };
         }
         Shell.prototype.init = function () {
             var sc;
@@ -51,6 +69,9 @@ var TSOS;
             this.commandList[this.commandList.length] = sc;
             // date
             sc = new TSOS.ShellCommand(this.shellDate, "date", " - Returns the current date and time.");
+            this.commandList[this.commandList.length] = sc;
+            // date
+            sc = new TSOS.ShellCommand(this.shellWhereAmI, "whereami", " - Returns your current location.");
             this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
@@ -251,7 +272,7 @@ var TSOS;
         };
         Shell.prototype.shellDate = function (args) {
             if (args.length > 0) {
-                _StdOut.putText("Usage: date  Date does not take any args.");
+                _StdOut.putText("Usage: date  date does not take any args.");
             }
             else {
                 var currentDate = new Date().toString();

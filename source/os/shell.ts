@@ -85,6 +85,12 @@ module TSOS {
                 " - Returns the current date and time.");
             this.commandList[this.commandList.length] = sc;
 
+            // date
+            sc = new ShellCommand(this.shellWhereAmI,
+                "whereami",
+                " - Returns your current location.");
+            this.commandList[this.commandList.length] = sc;
+
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
 
@@ -295,13 +301,32 @@ module TSOS {
 
         public shellDate(args) {
             if (args.length > 0) {
-                _StdOut.putText("Usage: date  Date does not take any args.");
+                _StdOut.putText("Usage: date  date does not take any args.");
 
             }
             else {
                 var currentDate = new Date().toString();
 
                 _StdOut.putText(currentDate);
+            }
+
+        }
+
+        public shellWhereAmI = (args) => {
+            if (args.length > 0) {
+                _StdOut.putText("Usage: whereami  whereami does not take any args.");
+
+            } else {
+                if (navigator.geolocation && _SarcasticMode) {
+                    _StdOut.putText("Locating...");
+                    navigator.geolocation.getCurrentPosition((position) => {
+                        _StdOut.putText("(" + position.coords.latitude + ", " + position.coords.longitude + ")." + " I'm watching you.");
+                    }, (error) => {
+                        _StdOut.putText("Who Knows?");
+                    });
+                } else {
+                    _StdOut.putText("Who Knows?");
+                }
             }
 
         }
