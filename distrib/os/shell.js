@@ -73,6 +73,9 @@ var TSOS;
             // date
             sc = new TSOS.ShellCommand(this.shellWhereAmI, "whereami", " - Returns your current location.");
             this.commandList[this.commandList.length] = sc;
+            // sarcastic <on | off>
+            sc = new TSOS.ShellCommand(this.shellSarcastic, "sarcastic", "<on | off> - Turns sarcastic mode on or off.");
+            this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
             //
@@ -277,6 +280,27 @@ var TSOS;
             else {
                 var currentDate = new Date().toString();
                 _StdOut.putText(currentDate);
+            }
+        };
+        Shell.prototype.shellSarcastic = function (args) {
+            console.log(args);
+            if (args.length > 0) {
+                switch (args[0]) {
+                    case "on":
+                        _SarcasticMode = true;
+                        _StdOut.putText("Sarcastic mode turned on. Watch out.");
+                        break;
+                    case "off":
+                        _SarcasticMode = false;
+                        _StdOut.putText("Sarcastic mode turned off. You're safe here.");
+                        break;
+                    default:
+                        _StdOut.putText("Usage: toggleSarcasticMode <on | off>  Please supply <on | off>.");
+                        break;
+                }
+            }
+            else {
+                _StdOut.putText("Usage: toggleSarcasticMode <on | off>  Please supply <on | off>.");
             }
         };
         return Shell;
