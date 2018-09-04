@@ -1,3 +1,138 @@
+/* ------------
+   Globals.ts
+
+   Global CONSTANTS and _Variables.
+   (Global over both the OS and Hardware Simulation / Host.)
+
+   This code references page numbers in the text book:
+   Operating System Concepts 8th edition by Silberschatz, Galvin, and Gagne.  ISBN 978-0-470-12872-5
+   ------------ */
+//
+// Global CONSTANTS (TypeScript 1.5 introduced const. Very cool.)
+//
+var APP_NAME = "ElettoOS"; // 'cause Bob and I were at a loss for a better name.
+var APP_VERSION = "0.10"; // What did you expect?
+var CPU_CLOCK_INTERVAL = 100; // This is in ms (milliseconds) so 1000 = 1 second.
+var TIMER_IRQ = 0; // Pages 23 (timer), 9 (interrupts), and 561 (interrupt priority).
+// NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
+var KEYBOARD_IRQ = 1;
+//
+// Global Variables
+// TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.
+//
+var _CPU; // Utilize TypeScript's type annotation system to ensure that _CPU is an instance of the Cpu class.
+var _OSclock = 0; // Page 23.
+var _Mode = 0; // (currently unused)  0 = Kernel Mode, 1 = User Mode.  See page 21.
+var _Canvas; // Initialized in Control.hostInit().
+var _DrawingContext; // = _Canvas.getContext("2d");  // Assigned here for type safety, but re-initialized in Control.hostInit() for OCD and logic.
+var _DefaultFontFamily = "sans"; // Ignored, I think. The was just a place-holder in 2008, but the HTML canvas may have use for it.
+var _DefaultFontSize = 13;
+var _FontHeightMargin = 4; // Additional space added to font size when advancing a line.
+var _Trace = true; // Default the OS trace to be on.
+// The OS Kernel and its queues.
+var _Kernel;
+var _KernelInterruptQueue; // Initializing this to null (which I would normally do) would then require us to specify the 'any' type, as below.
+var _KernelInputQueue = null; // Is this better? I don't like uninitialized variables. But I also don't like using the type specifier 'any'
+var _KernelBuffers = null; // when clearly 'any' is not what we want. There is likely a better way, but what is it?
+// Standard input and output
+var _StdIn; // Same "to null or not to null" issue as above.
+var _StdOut;
+// UI
+var _Console;
+var _OsShell;
+// At least this OS is not trying to kill you. (Yet.)
+var _SarcasticMode = false;
+// Global Device Driver Objects - page 12
+var _krnKeyboardDriver; //  = null;
+var _hardwareClockID = null;
+// For testing (and enrichment)...
+var Glados = null; // This is the function Glados() in glados.js on Labouseur.com.
+var _GLaDOS = null; // If the above is linked in, this is the instantiated instance of Glados.
+var onDocumentLoad = function () {
+    TSOS.Control.hostInit();
+};
+/* --------
+   Utils.ts
+
+   Utility functions.
+   -------- */
+var TSOS;
+/* --------
+   Utils.ts
+
+   Utility functions.
+   -------- */
+(function (TSOS) {
+    var Utils = /** @class */ (function () {
+        function Utils() {
+        }
+        Utils.trim = function (str) {
+            // Use a regular expression to remove leading and trailing spaces.
+            return str.replace(/^\s+ | \s+$/g, "");
+            /*
+            Huh? WTF? Okay... take a breath. Here we go:
+            - The "|" separates this into two expressions, as in A or B.
+            - "^\s+" matches a sequence of one or more whitespace characters at the beginning of a string.
+            - "\s+$" is the same thing, but at the end of the string.
+            - "g" makes is global, so we get all the whitespace.
+            - "" is nothing, which is what we replace the whitespace with.
+            */
+        };
+        Utils.rot13 = function (str) {
+            /*
+               This is an easy-to understand implementation of the famous and common Rot13 obfuscator.
+               You can do this in three lines with a complex regular expression, but I'd have
+               trouble explaining it in the future.  There's a lot to be said for obvious code.
+            */
+            var retVal = "";
+            for (var i in str) {
+                var ch = str[i];
+                var code = 0;
+                if ("abcedfghijklmABCDEFGHIJKLM".indexOf(ch) >= 0) {
+                    code = str.charCodeAt(Number(i)) + 13; // It's okay to use 13.  It's not a magic number, it's called rot13.
+                    retVal = retVal + String.fromCharCode(code);
+                }
+                else if ("nopqrstuvwxyzNOPQRSTUVWXYZ".indexOf(ch) >= 0) {
+                    code = str.charCodeAt(Number(i)) - 13; // It's okay to use 13.  See above.
+                    retVal = retVal + String.fromCharCode(code);
+                }
+                else {
+                    retVal = retVal + ch;
+                }
+            }
+            return retVal;
+        };
+        return Utils;
+    }());
+    TSOS.Utils = Utils;
+})(TSOS || (TSOS = {}));
+var TSOS;
+(function (TSOS) {
+    var ShellCommand = /** @class */ (function () {
+        function ShellCommand(func, command, description) {
+            if (command === void 0) { command = ""; }
+            if (description === void 0) { description = ""; }
+            this.func = func;
+            this.command = command;
+            this.description = description;
+        }
+        return ShellCommand;
+    }());
+    TSOS.ShellCommand = ShellCommand;
+})(TSOS || (TSOS = {}));
+var TSOS;
+(function (TSOS) {
+    var UserCommand = /** @class */ (function () {
+        function UserCommand(command, args) {
+            if (command === void 0) { command = ""; }
+            if (args === void 0) { args = []; }
+            this.command = command;
+            this.args = args;
+        }
+        return UserCommand;
+    }());
+    TSOS.UserCommand = UserCommand;
+})(TSOS || (TSOS = {}));
 ///<reference path="../globals.ts" />
 ///<reference path="../utils.ts" />
 ///<reference path="shellCommand.ts" />
@@ -12,6 +147,19 @@
    ------------ */
 // TODO: Write a base class / prototype for system services and let Shell inherit from it.
 var TSOS;
+///<reference path="../globals.ts" />
+///<reference path="../utils.ts" />
+///<reference path="shellCommand.ts" />
+///<reference path="userCommand.ts" />
+/* ------------
+   Shell.ts
+
+   The OS Shell - The "command line interface" (CLI) for the console.
+
+    Note: While fun and learning are the primary goals of all enrichment center activities,
+          serious injuries may occur when trying to write your own Operating System.
+   ------------ */
+// TODO: Write a base class / prototype for system services and let Shell inherit from it.
 (function (TSOS) {
     var Shell = /** @class */ (function () {
         function Shell() {
@@ -50,7 +198,7 @@ var TSOS;
             sc = new TSOS.ShellCommand(this.shellPrompt, "prompt", "<string> - Sets the prompt.");
             this.commandList[this.commandList.length] = sc;
             // date
-            sc = new TSOS.ShellCommand(this.shellDate, "date", " - Returns the current date and time.");
+            sc = new TSOS.ShellCommand(this.shellDate, "date", " - Sets the prompt.");
             this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
@@ -92,13 +240,13 @@ var TSOS;
             }
             else {
                 // It's not found, so check for curses and apologies before declaring the command invalid.
-                if (this.curses.indexOf("[" + TSOS.Utils.rot13(cmd) + "]") >= 0) { // Check for curses.
+                if (this.curses.indexOf("[" + TSOS.Utils.rot13(cmd) + "]") >= 0) {
                     this.execute(this.shellCurse);
                 }
-                else if (this.apologies.indexOf("[" + cmd + "]") >= 0) { // Check for apologies.
+                else if (this.apologies.indexOf("[" + cmd + "]") >= 0) {
                     this.execute(this.shellApology);
                 }
-                else { // It's just a bad command. {
+                else {
                     this.execute(this.shellInvalidCommand);
                 }
             }
@@ -250,8 +398,7 @@ var TSOS;
             }
         };
         Shell.prototype.shellDate = function (args) {
-            var currentDate = new Date().toString();
-            _StdOut.putText(currentDate);
+            _StdOut.putText("test");
         };
         return Shell;
     }());
