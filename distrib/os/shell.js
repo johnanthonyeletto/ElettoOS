@@ -27,6 +27,7 @@ var TSOS;
                 else {
                     if (navigator.geolocation && _SarcasticMode) {
                         _StdOut.putText("Locating...");
+                        _StdOut.advanceLine();
                         navigator.geolocation.getCurrentPosition(function (position) {
                             _StdOut.putText("(" + position.coords.latitude + ", " + position.coords.longitude + ")." + " I'm watching you.");
                         }, function (error) {
@@ -199,6 +200,12 @@ var TSOS;
             _StdOut.putText(APP_NAME + " version " + APP_VERSION);
         };
         Shell.prototype.shellHelp = function (args) {
+            if (_SarcasticMode) {
+                _StdOut.putText("I 'aint helping you.");
+                _StdOut.advanceLine();
+                _StdOut.putText("Kidding...");
+                _StdOut.advanceLine();
+            }
             _StdOut.putText("Commands:");
             for (var i in _OsShell.commandList) {
                 _StdOut.advanceLine();
@@ -283,8 +290,7 @@ var TSOS;
             }
         };
         Shell.prototype.shellSarcastic = function (args) {
-            console.log(args);
-            if (args.length > 0) {
+            if (args.length == 1) {
                 switch (args[0]) {
                     case "on":
                         _SarcasticMode = true;
