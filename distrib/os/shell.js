@@ -250,8 +250,13 @@ var TSOS;
             }
         };
         Shell.prototype.shellDate = function (args) {
-            var currentDate = new Date().toString();
-            _StdOut.putText(currentDate);
+            if (args.length > 0) {
+                _StdOut.putText("Usage: date  Date does not take any args.");
+            }
+            else {
+                var currentDate = new Date().toString();
+                _StdOut.putText(currentDate);
+            }
         };
         return Shell;
     }());

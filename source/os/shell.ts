@@ -294,9 +294,16 @@ module TSOS {
         }
 
         public shellDate(args) {
-            var currentDate = new Date().toString();
+            if (args.length > 0) {
+                _StdOut.putText("Usage: date  Date does not take any args.");
 
-            _StdOut.putText(currentDate);
+            }
+            else {
+                var currentDate = new Date().toString();
+
+                _StdOut.putText(currentDate);
+            }
+
         }
 
     }
