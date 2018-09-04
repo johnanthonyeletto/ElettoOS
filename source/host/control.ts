@@ -86,6 +86,8 @@ module TSOS {
             (<HTMLButtonElement>document.getElementById("btnHaltOS")).disabled = false;
             (<HTMLButtonElement>document.getElementById("btnReset")).disabled = false;
 
+            (document.getElementById("systemStatusIndicator").innerHTML = "John Eletto Made Me.");
+
             // .. set focus on the OS console display ...
             document.getElementById("display").focus();
 
