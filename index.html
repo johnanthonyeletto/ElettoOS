@@ -58,8 +58,8 @@
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col bg-light">
+        <div class="row bg-light">
+            <div class="col-md">
                 <input type="button" id="btnStartOS" name="brnStartOS" class="btn btn-primary" value="Start" tabindex="0" onclick="TSOS.Control.hostBtnStartOS_click(this);">
 
                 <input type="button" id="btnHaltOS" name="brnHaltOS" class="btn btn-warning" disabled="disabled" value="Halt" tabindex="1"
@@ -67,6 +67,12 @@
 
                 <input type="button" id="btnReset" name="brnReset" class="btn btn-danger" disabled="disabled" value="Reset" tabindex="2"
                     onclick="TSOS.Control.hostBtnReset_click(this);">
+            </div>
+            <div class="col-md text-right pt-3">
+                <p>
+                    <b>Status:</b> <span id="systemStatusIndicator">John Eletto made me.</span>
+                    <b>Time:</b> <span id="systemStatusIndicator">5:00 pm.</span>
+                </p>
             </div>
         </div>
 
@@ -78,7 +84,7 @@
                 </div>
                 <div class="col-md">
                     <h4>Host Log</h4>
-                    <textarea name="taHostLog" id="taHostLog" class="form-control" rows="13"></textarea>
+                    <textarea name="taHostLog" id="taHostLog" class="form-control" rows="13" readonly></textarea>
                     <br/>
                     <h4>User Program Input</h4>
                     <textarea name="taProgramInput" id="taProgramInput" class="form-control" rows="8"></textarea>
