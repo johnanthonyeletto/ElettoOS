@@ -10,17 +10,21 @@
 var TSOS;
 (function (TSOS) {
     var Console = /** @class */ (function () {
-        function Console(currentFont, currentFontSize, currentXPosition, currentYPosition, buffer) {
+        function Console(currentFont, currentFontSize, currentXPosition, currentYPosition, buffer, commandHistory, commandHistoryPointer) {
             if (currentFont === void 0) { currentFont = _DefaultFontFamily; }
             if (currentFontSize === void 0) { currentFontSize = _DefaultFontSize; }
             if (currentXPosition === void 0) { currentXPosition = 0; }
             if (currentYPosition === void 0) { currentYPosition = _DefaultFontSize; }
             if (buffer === void 0) { buffer = ""; }
+            if (commandHistory === void 0) { commandHistory = []; }
+            if (commandHistoryPointer === void 0) { commandHistoryPointer = 0; }
             this.currentFont = currentFont;
             this.currentFontSize = currentFontSize;
             this.currentXPosition = currentXPosition;
             this.currentYPosition = currentYPosition;
             this.buffer = buffer;
+            this.commandHistory = commandHistory;
+            this.commandHistoryPointer = commandHistoryPointer;
         }
         Console.prototype.init = function () {
             this.clearScreen();
@@ -43,6 +47,8 @@ var TSOS;
                     // ... tell the shell ...
                     _OsShell.handleInput(this.buffer);
                     // ... and reset our buffer.
+                    this.commandHistory.push(this.buffer);
+                    this.commandHistoryPointer = this.commandHistory.length;
                     this.buffer = "";
                 }
                 else if (chr === String.fromCharCode(8)) {
@@ -52,6 +58,14 @@ var TSOS;
                 else if (chr === String.fromCharCode(9)) {
                     // Tab
                     this.commandComplete();
+                }
+                else if (chr === String.fromCharCode(38)) {
+                    // upArrow
+                    this.arrowUp();
+                }
+                else if (chr === String.fromCharCode(40)) {
+                    // downArrow
+                    this.arrowDown();
                 }
                 else {
                     // This is a "normal" character, so ...
@@ -80,11 +94,14 @@ var TSOS;
                 this.currentXPosition = this.currentXPosition + offset;
             }
         };
-        Console.prototype.backspace = function () {
+        Console.prototype.clearCurrentLine = function () {
             // Clear current line
             var lineHeight = _DefaultFontSize + _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) + _FontHeightMargin;
             this.currentXPosition = 0;
             _DrawingContext.clearRect(0, this.currentYPosition - lineHeight + 5, _Canvas.width, lineHeight * 2);
+        };
+        Console.prototype.backspace = function () {
+            this.clearCurrentLine();
             // Redraw buffer - 1
             this.putText(_OsShell.promptStr);
             this.buffer = this.buffer.substring(0, this.buffer.length - 1);
@@ -98,13 +115,33 @@ var TSOS;
                     matchingCommand = command.command;
                 }
             });
-            // Clear current line
-            var lineHeight = _DefaultFontSize + _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) + _FontHeightMargin;
-            this.currentXPosition = 0;
-            _DrawingContext.clearRect(0, this.currentYPosition - lineHeight + 5, _Canvas.width, lineHeight * 2);
+            this.clearCurrentLine();
             this.putText(_OsShell.promptStr);
             this.buffer = matchingCommand;
             this.putText(matchingCommand);
+        };
+        Console.prototype.arrowUp = function () {
+            if (this.commandHistoryPointer > 0) {
+                this.commandHistoryPointer--;
+            }
+            this.clearCurrentLine();
+            this.putText(_OsShell.promptStr);
+            this.buffer = this.commandHistory[this.commandHistoryPointer];
+            this.putText(this.buffer);
+        };
+        Console.prototype.arrowDown = function () {
+            if (this.commandHistoryPointer < this.commandHistory.length - 1) {
+                this.commandHistoryPointer++;
+            }
+            else {
+                this.clearCurrentLine();
+                this.putText(_OsShell.promptStr);
+                return;
+            }
+            this.clearCurrentLine();
+            this.putText(_OsShell.promptStr);
+            this.buffer = this.commandHistory[this.commandHistoryPointer];
+            this.putText(this.buffer);
         };
         Console.prototype.advanceLine = function () {
             this.currentXPosition = 0;

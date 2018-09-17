@@ -17,8 +17,10 @@ module TSOS {
             public currentFontSize = _DefaultFontSize,
             public currentXPosition = 0,
             public currentYPosition = _DefaultFontSize,
-            public buffer = "") {
-        }
+            public buffer = "",
+            private commandHistory = [],
+            private commandHistoryPointer = 0
+        ) { }
 
         public init(): void {
             this.clearScreen();
@@ -44,6 +46,8 @@ module TSOS {
                     // ... tell the shell ...
                     _OsShell.handleInput(this.buffer);
                     // ... and reset our buffer.
+                    this.commandHistory.push(this.buffer);
+                    this.commandHistoryPointer = this.commandHistory.length;
                     this.buffer = "";
                 } else if (chr === String.fromCharCode(8)) {
                     // Backspace
@@ -51,6 +55,13 @@ module TSOS {
                 } else if (chr === String.fromCharCode(9)) {
                     // Tab
                     this.commandComplete();
+                }
+                else if (chr === String.fromCharCode(38)) {
+                    // upArrow
+                    this.arrowUp();
+                } else if (chr === String.fromCharCode(40)) {
+                    // downArrow
+                    this.arrowDown();
                 }
                 else {
                     // This is a "normal" character, so ...
@@ -81,11 +92,15 @@ module TSOS {
             }
         }
 
-        private backspace(): void {
+        private clearCurrentLine(): void {
             // Clear current line
             var lineHeight = _DefaultFontSize + _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) + _FontHeightMargin;
             this.currentXPosition = 0;
             _DrawingContext.clearRect(0, this.currentYPosition - lineHeight + 5, _Canvas.width, lineHeight * 2);
+        }
+
+        private backspace(): void {
+            this.clearCurrentLine();
 
             // Redraw buffer - 1
             this.putText(_OsShell.promptStr);
@@ -102,15 +117,37 @@ module TSOS {
                 }
             });
 
-            // Clear current line
-            var lineHeight = _DefaultFontSize + _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) + _FontHeightMargin;
-            this.currentXPosition = 0;
-            _DrawingContext.clearRect(0, this.currentYPosition - lineHeight + 5, _Canvas.width, lineHeight * 2);
+            this.clearCurrentLine();
 
             this.putText(_OsShell.promptStr);
             this.buffer = matchingCommand;
             this.putText(matchingCommand);
 
+        }
+
+        private arrowUp(): void {
+            if (this.commandHistoryPointer > 0) {
+                this.commandHistoryPointer--;
+            }
+
+            this.clearCurrentLine();
+            this.putText(_OsShell.promptStr);
+            this.buffer = this.commandHistory[this.commandHistoryPointer];
+            this.putText(this.buffer);
+        }
+
+        private arrowDown(): void {
+            if (this.commandHistoryPointer < this.commandHistory.length - 1) {
+                this.commandHistoryPointer++;
+            } else {
+                this.clearCurrentLine();
+                this.putText(_OsShell.promptStr);
+                return;
+            }
+            this.clearCurrentLine();
+            this.putText(_OsShell.promptStr);
+            this.buffer = this.commandHistory[this.commandHistoryPointer];
+            this.putText(this.buffer);
         }
 
         public advanceLine(): void {
