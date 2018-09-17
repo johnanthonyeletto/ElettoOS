@@ -328,6 +328,8 @@ module TSOS {
                 _StdOut.putText(currentDate);
             }
 
+            _StdOut.advanceLine();
+
         }
 
         public shellWhereAmI = (args) => {
@@ -340,13 +342,17 @@ module TSOS {
                     _StdOut.advanceLine();
                     navigator.geolocation.getCurrentPosition((position) => {
                         _StdOut.putText("(" + position.coords.latitude + ", " + position.coords.longitude + ")." + " I'm watching you.");
+                        _StdOut.advanceLine();
                     }, (error) => {
                         _StdOut.putText("Who Knows?");
+                        _StdOut.advanceLine();
                     });
                 } else {
                     _StdOut.putText("Who Knows?");
+                    _StdOut.advanceLine();
                 }
             }
+
 
         }
 
@@ -368,6 +374,7 @@ module TSOS {
             } else {
                 _StdOut.putText("Usage: toggleSarcasticMode <on | off>  Please supply <on | off>.");
             }
+            _StdOut.advanceLine();
         }
 
         public shellStatus(args) {
@@ -381,6 +388,7 @@ module TSOS {
             else {
                 _StdOut.putText("Usage: status <string>  Please supply a new status.");
             }
+            _StdOut.advanceLine();
         }
     }
 }

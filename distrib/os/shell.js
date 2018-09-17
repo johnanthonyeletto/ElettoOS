@@ -30,12 +30,15 @@ var TSOS;
                         _StdOut.advanceLine();
                         navigator.geolocation.getCurrentPosition(function (position) {
                             _StdOut.putText("(" + position.coords.latitude + ", " + position.coords.longitude + ")." + " I'm watching you.");
+                            _StdOut.advanceLine();
                         }, function (error) {
                             _StdOut.putText("Who Knows?");
+                            _StdOut.advanceLine();
                         });
                     }
                     else {
                         _StdOut.putText("Who Knows?");
+                        _StdOut.advanceLine();
                     }
                 }
             };
@@ -291,6 +294,7 @@ var TSOS;
                 var currentDate = new Date().toString();
                 _StdOut.putText(currentDate);
             }
+            _StdOut.advanceLine();
         };
         Shell.prototype.shellSarcastic = function (args) {
             if (args.length == 1) {
@@ -311,6 +315,7 @@ var TSOS;
             else {
                 _StdOut.putText("Usage: toggleSarcasticMode <on | off>  Please supply <on | off>.");
             }
+            _StdOut.advanceLine();
         };
         Shell.prototype.shellStatus = function (args) {
             if (args.length > 0) {
@@ -323,6 +328,7 @@ var TSOS;
             else {
                 _StdOut.putText("Usage: status <string>  Please supply a new status.");
             }
+            _StdOut.advanceLine();
         };
         return Shell;
     }());

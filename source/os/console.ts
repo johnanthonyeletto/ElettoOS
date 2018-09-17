@@ -47,8 +47,10 @@ module TSOS {
                     this.buffer = "";
                 } else if (chr === String.fromCharCode(8)) {
                     // Backspace
-                    console.log("backspace");
                     this.backspace();
+                } else if (chr === String.fromCharCode(9)) {
+                    // Tab
+                    this.commandComplete();
                 }
                 else {
                     // This is a "normal" character, so ...
@@ -89,6 +91,26 @@ module TSOS {
             this.putText(_OsShell.promptStr);
             this.buffer = this.buffer.substring(0, this.buffer.length - 1);
             this.putText(this.buffer);
+        }
+
+        private commandComplete(): void {
+            var currentBuffer = this.buffer;
+            var matchingCommand = this.buffer;
+            _OsShell.commandList.forEach(function (command) {
+                if (command.command.substring(0, currentBuffer.length) == currentBuffer) {
+                    matchingCommand = command.command;
+                }
+            });
+
+            // Clear current line
+            var lineHeight = _DefaultFontSize + _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) + _FontHeightMargin;
+            this.currentXPosition = 0;
+            _DrawingContext.clearRect(0, this.currentYPosition - lineHeight + 5, _Canvas.width, lineHeight * 2);
+
+            this.putText(_OsShell.promptStr);
+            this.buffer = matchingCommand;
+            this.putText(matchingCommand);
+
         }
 
         public advanceLine(): void {
