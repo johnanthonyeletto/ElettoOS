@@ -83,6 +83,9 @@ var TSOS;
             // status <string>
             sc = new TSOS.ShellCommand(this.shellStatus, "status", "<string> - Changes current status of OS.");
             this.commandList[this.commandList.length] = sc;
+            // load
+            sc = new TSOS.ShellCommand(this.shellLoad, "load", " - Loads hex program.");
+            this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
             //
@@ -329,6 +332,22 @@ var TSOS;
                 _StdOut.putText("Usage: status <string>  Please supply a new status.");
             }
             _StdOut.advanceLine();
+        };
+        Shell.prototype.shellLoad = function (args) {
+            if (args.length > 0) {
+                _StdOut.putText("Usage: load - Load does not take any args.");
+            }
+            else {
+                // validate hex
+                var hexRegex = new RegExp("^[0-9A-F ]+$");
+                var input = document.getElementById("taProgramInput").value;
+                if (hexRegex.test(input)) {
+                    _StdOut.putText("Valid Program");
+                }
+                else {
+                    _StdOut.putText("InValid Program");
+                }
+            }
         };
         return Shell;
     }());
