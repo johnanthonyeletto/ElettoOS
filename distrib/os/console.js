@@ -45,6 +45,11 @@ var TSOS;
                     // ... and reset our buffer.
                     this.buffer = "";
                 }
+                else if (chr === String.fromCharCode(8)) {
+                    // Backspace
+                    console.log("backspace");
+                    this.backspace();
+                }
                 else {
                     // This is a "normal" character, so ...
                     // ... draw it on the screen...
@@ -71,6 +76,18 @@ var TSOS;
                 var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
                 this.currentXPosition = this.currentXPosition + offset;
             }
+        };
+        Console.prototype.backspace = function () {
+            this.clearCurrentLine();
+            this.putText(_OsShell.promptStr);
+            this.buffer = this.buffer.substring(0, this.buffer.length - 1);
+            this.putText(this.buffer);
+        };
+        Console.prototype.clearCurrentLine = function () {
+            //Helper function to clear a line
+            var lineHeight = _DefaultFontSize + _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) + _FontHeightMargin;
+            this.currentXPosition = 0;
+            _DrawingContext.clearRect(0, this.currentYPosition - lineHeight + 5, _Canvas.width, lineHeight * 2);
         };
         Console.prototype.advanceLine = function () {
             this.currentXPosition = 0;
