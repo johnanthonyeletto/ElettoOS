@@ -313,7 +313,7 @@ var TSOS;
                         _StdOut.putText("Sarcastic mode turned off. You're safe here.");
                         break;
                     default:
-                        _StdOut.putText("Usage: toggleSarcasticMode <on | off>  Please supply <on | off>.");
+                        _StdOut.putText("Usage: sarcastic <on | off>  Please supply <on | off>.");
                         break;
                 }
             }
@@ -344,10 +344,10 @@ var TSOS;
                 var hexRegex = new RegExp("^[0-9A-F ]+$");
                 var input = document.getElementById("taProgramInput").value;
                 if (hexRegex.test(input)) {
-                    _StdOut.putText("Valid Program");
+                    _StdOut.putText("Valid Hex.");
                 }
                 else {
-                    _StdOut.putText("InValid Program");
+                    _StdOut.putText("Invalid Hex.");
                 }
             }
         };
