@@ -2,7 +2,8 @@
 
 ## For Grading:
 Please grade releases.
-*iProject1 - 1.0
-*iProject2 - 2.0
-*iProject3 - 3.0
-*Final Project - 4.0
+<br/>
+* iProject1 - 0.1
+* iProject2 - 0.2
+* iProject3 - 0.3
+* Final Project - 1.0
