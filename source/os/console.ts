@@ -63,7 +63,6 @@ module TSOS {
                     }
 
                     this.commandHistoryPointer = this.commandHistory.length;
-                    console.log(this.commandHistoryPointer);
 
                     this.buffer = "";
                 } else if (chr === String.fromCharCode(8)) {
