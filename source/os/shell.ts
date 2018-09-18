@@ -273,16 +273,15 @@ module TSOS {
         }
 
         public shellMan(args) {
-            if (args.length > 0) {
+            if (args.length == 1) {
                 var topic = args[0];
-                switch (topic) {
-                    case "help":
-                        _StdOut.putText("Help displays a list of (hopefully) valid commands.");
-                        break;
-                    // TODO: Make descriptive MANual page entries for the the rest of the shell commands here.
-                    default:
-                        _StdOut.putText("No manual entry for " + args[0] + ".");
-                }
+                var response = "No manual entry was found for " + topic;
+                _OsShell.commandList.forEach(function (cmd) {
+                    if (args[0] == cmd.command) {
+                        response = cmd.description;
+                    }
+                });
+                _StdOut.putText(response);
             } else {
                 _StdOut.putText("Usage: man <topic>  Please supply a topic.");
             }
