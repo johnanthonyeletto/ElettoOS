@@ -414,8 +414,11 @@ module TSOS {
 
                 if (hexRegex.test(input)) {
                     _StdOut.putText("Valid Hex.");
+                    document.getElementById("taProgramInput").style.backgroundColor = "#C8E6C9";
+
                 } else {
                     _StdOut.putText("Invalid Hex.");
+                    document.getElementById("taProgramInput").style.backgroundColor = "#FFCDD2";
                 }
 
             }

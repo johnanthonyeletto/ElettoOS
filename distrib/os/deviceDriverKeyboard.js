@@ -60,8 +60,7 @@ var TSOS;
                 // TODO: Check for caps-lock and handle as shifted if so.
                 _KernelInputQueue.enqueue(chr);
             }
-            else if ((keyCode > 185 && keyCode < 193) || // ;=,-./` (in order)
-                (keyCode > 218 && keyCode < 223)) {
+            else if ([188, 190, 191].indexOf(keyCode) != -1) {
                 chr = String.fromCharCode(keyCode - 144);
                 _KernelInputQueue.enqueue(chr);
             }
