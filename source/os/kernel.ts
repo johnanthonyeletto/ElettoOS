@@ -32,7 +32,7 @@ module TSOS {
             _Console.init();
 
             // Initialize standard input and output to the _Console.
-            _StdIn  = _Console;
+            _StdIn = _Console;
             _StdOut = _Console;
 
             // Load the Keyboard Device Driver
@@ -156,8 +156,8 @@ module TSOS {
         // OS Utility Routines
         //
         public krnTrace(msg: string) {
-             // Check globals to see if trace is set ON.  If so, then (maybe) log the message.
-             if (_Trace) {
+            // Check globals to see if trace is set ON.  If so, then (maybe) log the message.
+            if (_Trace) {
                 if (msg === "Idle") {
                     // We can't log every idle clock pulse because it would lag the browser very quickly.
                     if (_OSclock % 10 == 0) {
@@ -168,12 +168,14 @@ module TSOS {
                 } else {
                     Control.hostLog(msg, "OS");
                 }
-             }
+            }
         }
 
         public krnTrapError(msg) {
             Control.hostLog("OS ERROR - TRAP: " + msg);
             // TODO: Display error on console, perhaps in some sort of colored screen. (Maybe blue?)
+            document.getElementById("display").style.backgroundColor = 'blue';
+            _StdOut.putText("OS ERROR - TRAP: " + msg);
             this.krnShutdown();
         }
     }

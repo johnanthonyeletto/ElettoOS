@@ -86,6 +86,9 @@ var TSOS;
             // load
             sc = new TSOS.ShellCommand(this.shellLoad, "load", " - Loads hex program.");
             this.commandList[this.commandList.length] = sc;
+            // fail
+            sc = new TSOS.ShellCommand(this.shellFail, "fail", " - Causes the OS to fail.");
+            this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
             //
@@ -347,6 +350,14 @@ var TSOS;
                 else {
                     _StdOut.putText("InValid Program");
                 }
+            }
+        };
+        Shell.prototype.shellFail = function (args) {
+            if (args.length > 0) {
+                _StdOut.putText("Usage: fail - Fail does not take any args.");
+            }
+            else {
+                _Kernel.krnTrapError("OS Failed.");
             }
         };
         return Shell;
