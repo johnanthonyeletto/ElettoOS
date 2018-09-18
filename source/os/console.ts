@@ -46,8 +46,25 @@ module TSOS {
                     // ... tell the shell ...
                     _OsShell.handleInput(this.buffer);
                     // ... and reset our buffer.
+
+
+
                     this.commandHistory.push(this.buffer);
+
+
+                    // Limit command recall to 100 commands. This prevents slow computers like mine from crying.
+                    if (this.commandHistory.length > 100) {
+                        var tempCommandHistory = [];
+
+                        for (var i = (this.commandHistory.length - 100); i < this.commandHistory.length; i++) {
+                            tempCommandHistory.push(this.commandHistory[i]);
+                        }
+                        this.commandHistory = tempCommandHistory;
+                    }
+
                     this.commandHistoryPointer = this.commandHistory.length;
+                    console.log(this.commandHistoryPointer);
+
                     this.buffer = "";
                 } else if (chr === String.fromCharCode(8)) {
                     // Backspace
