@@ -95,11 +95,22 @@ var TSOS;
             // UPDATE: Even though we are now working in TypeScript, char and string remain undistinguished.
             //         Consider fixing that.
             if (text !== "") {
-                // Draw the text at the current X and Y coordinates.
-                _DrawingContext.drawText(this.currentFont, this.currentFontSize, this.currentXPosition, this.currentYPosition, text);
-                // Move the current X position.
-                var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
-                this.currentXPosition = this.currentXPosition + offset;
+                var textArray = text.split(" ");
+                for (var i = 0; i < textArray.length; i++) {
+                    // Draw text word by word.
+                    var word = (textArray.length > 1) ? textArray[i] + " " : textArray[i];
+                    if (_DrawingContext.measureText(this.currentFont, this.currentFontSize, word) + this.currentXPosition > _Canvas.width) {
+                        this.advanceLine();
+                    }
+                    _DrawingContext.drawText(this.currentFont, this.currentFontSize, this.currentXPosition, this.currentYPosition, word);
+                    var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, word);
+                    this.currentXPosition = this.currentXPosition + offset;
+                }
+                // // Draw the text at the current X and Y coordinates.
+                // _DrawingContext.drawText(this.currentFont, this.currentFontSize, this.currentXPosition, this.currentYPosition, text);
+                // // Move the current X position.
+                // var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
+                // this.currentXPosition = this.currentXPosition + offset;
             }
         };
         Console.prototype.clearCurrentLine = function () {
