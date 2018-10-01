@@ -64,6 +64,10 @@ module TSOS {
             this.opCodes[opCode]();
         }
 
+
+        // USE PARSEINT(VALUE, 16) TO CONVERT TO DECIMAL
+
+
         private ldaConstant(): void {
             //Load the accumulator with a constant A9 LDA LDA #$07 A9 07
         }
