@@ -101,29 +101,27 @@ module TSOS {
             //         Consider fixing that.
             if (text !== "") {
 
+                // Splitting string can allow us to draw the text word by word.
                 var textArray = text.split(" ");
 
-                for(var i = 0; i < textArray.length; i++){
+                for (var i = 0; i < textArray.length; i++) {
                     // Draw text word by word.
-                    var word = (textArray.length > 1) ? textArray[i] + " ": textArray[i];
 
+                    // If there's more than one thing in our array (meaning that there were spaces), we will add the space back in after each word. We won't add a space if it's the last word.
+                    var word = (textArray.length > 1 || i != textArray.length - 1) ? textArray[i] + " " : textArray[i];
+
+                    // if the current word will cause the text to overflow
                     if (_DrawingContext.measureText(this.currentFont, this.currentFontSize, word) + this.currentXPosition > _Canvas.width) {
                         this.advanceLine();
                     }
 
 
-
+                    // Draw the text at the current (X,Y) coordinates.
                     _DrawingContext.drawText(this.currentFont, this.currentFontSize, this.currentXPosition, this.currentYPosition, word);
                     var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, word);
                     this.currentXPosition = this.currentXPosition + offset;
 
                 }
-
-                // // Draw the text at the current X and Y coordinates.
-                // _DrawingContext.drawText(this.currentFont, this.currentFontSize, this.currentXPosition, this.currentYPosition, text);
-                // // Move the current X position.
-                // var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
-                // this.currentXPosition = this.currentXPosition + offset;
             }
         }
 
