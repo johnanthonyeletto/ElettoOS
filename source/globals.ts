@@ -11,13 +11,13 @@
 //
 // Global CONSTANTS (TypeScript 1.5 introduced const. Very cool.)
 //
-const APP_NAME: string    = "ElettoOS";   // 'cause Bob and I were at a loss for a better name.
+const APP_NAME: string = "ElettoOS";   // 'cause Bob and I were at a loss for a better name.
 const APP_VERSION: string = "0.10";   // What did you expect?
 
 const CPU_CLOCK_INTERVAL: number = 100;   // This is in ms (milliseconds) so 1000 = 1 second.
 
 const TIMER_IRQ: number = 0;  // Pages 23 (timer), 9 (interrupts), and 561 (interrupt priority).
-                              // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
+// NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
 const KEYBOARD_IRQ: number = 1;
 
 
@@ -28,6 +28,8 @@ const KEYBOARD_IRQ: number = 1;
 var _CPU: TSOS.Cpu;  // Utilize TypeScript's type annotation system to ensure that _CPU is an instance of the Cpu class.
 
 var _Memory: TSOS.Memory;
+
+var _MemoryAccessor: TSOS.MemoryAccessor;
 
 var _OSclock: number = 0;  // Page 23.
 
@@ -46,6 +48,8 @@ var _Kernel: TSOS.Kernel;
 var _KernelInterruptQueue;          // Initializing this to null (which I would normally do) would then require us to specify the 'any' type, as below.
 var _KernelInputQueue: any = null;  // Is this better? I don't like uninitialized variables. But I also don't like using the type specifier 'any'
 var _KernelBuffers: any[] = null;   // when clearly 'any' is not what we want. There is likely a better way, but what is it?
+
+var _MemoryManager: any = null;
 
 // Standard input and output
 var _StdIn;    // Same "to null or not to null" issue as above.
@@ -67,6 +71,6 @@ var _hardwareClockID: number = null;
 var Glados: any = null;  // This is the function Glados() in glados.js on Labouseur.com.
 var _GLaDOS: any = null; // If the above is linked in, this is the instantiated instance of Glados.
 
-var onDocumentLoad = function() {
-	TSOS.Control.hostInit();
+var onDocumentLoad = function () {
+    TSOS.Control.hostInit();
 };

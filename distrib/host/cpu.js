@@ -61,6 +61,7 @@ var TSOS;
             var opCode = "A9";
             this.opCodes[opCode]();
         };
+        // USE PARSEINT(VALUE, 16) TO CONVERT TO DECIMAL
         Cpu.prototype.ldaConstant = function () {
             //Load the accumulator with a constant A9 LDA LDA #$07 A9 07
         };
@@ -93,6 +94,7 @@ var TSOS;
         };
         Cpu.prototype.brk = function () {
             //Break (which is really a system call) 00 BRK 00 00
+            return;
         };
         Cpu.prototype.cpx = function () {
             //Compare a byte in memory to the X reg EC CPX EC $0010 EC 10 00
