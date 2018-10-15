@@ -24,3 +24,8 @@
   background-color: blue;
   color: white;
 }
+
+#taHostLog{
+  width: 500px;
+  margin: 0 auto;
+}

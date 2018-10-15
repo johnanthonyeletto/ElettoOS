@@ -55,20 +55,21 @@
                 <div class="card card-image" style="background-image: url(https://mdbootstrap.com/img/Photos/Others/gradient1.jpg); background-size: cover;">
                     <div class="text-white text-center py-3">
                         <h1 class="card-title font-bold"><strong>ElettoOS</strong></h1>
-                        <h3>An Operating System For The People.</h3>
+                        <!-- <h3>An Operating System For The People.</h3> -->
                     </div>
                 </div>
             </div>
         </div>
         <div class="row bg-light">
             <div class="col-md">
-                <input type="button" id="btnStartOS" name="brnStartOS" class="btn btn-primary" value="Start" tabindex="0" onclick="TSOS.Control.hostBtnStartOS_click(this);">
+                <input type="button" id="btnStartOS" name="brnStartOS" class="btn btn-primary" value="Start" tabindex="0"
+                    onclick="TSOS.Control.hostBtnStartOS_click(this);">
 
-                <input type="button" id="btnHaltOS" name="brnHaltOS" class="btn btn-warning" disabled="disabled" value="Halt" tabindex="1"
-                    onclick="TSOS.Control.hostBtnHaltOS_click(this);">
+                <input type="button" id="btnHaltOS" name="brnHaltOS" class="btn btn-warning" disabled="disabled" value="Halt"
+                    tabindex="1" onclick="TSOS.Control.hostBtnHaltOS_click(this);">
 
-                <input type="button" id="btnReset" name="brnReset" class="btn btn-danger" disabled="disabled" value="Reset" tabindex="2"
-                    onclick="TSOS.Control.hostBtnReset_click(this);">
+                <input type="button" id="btnReset" name="brnReset" class="btn btn-danger" disabled="disabled" value="Reset"
+                    tabindex="2" onclick="TSOS.Control.hostBtnReset_click(this);">
             </div>
             <div class="col-md text-right pt-3">
                 <p>
@@ -83,11 +84,43 @@
                 <div class="col-md">
                     <h4>Terminal</h4>
                     <canvas id="display" width="500px" height="500px" tabindex="3"></canvas>
-                </div>
-                <div class="col-md">
                     <h4>Host Log</h4>
                     <textarea name="taHostLog" id="taHostLog" class="form-control" rows="10" readonly></textarea>
-                    <br/>
+                    <br />
+                </div>
+                <div class="col-md">
+                    <h4>Processes</h4>
+                    <table class="table table-striped">
+                        <thead>
+                            <th>PID</th>
+                            <th>PC</th>
+                            <th>IR</th>
+                            <th>ACC</th>
+                            <th>X</th>
+                            <th>Y</th>
+                            <th>Z</th>
+                            <th>Priority</th>
+                            <th>State</th>
+                            <th>Location</th>
+                        </thead>
+                    </table>
+
+                    <h4>CPU</h4>
+                    <table class="table table-striped">
+                        <thead>
+                            <th>PC</th>
+                            <th>IR</th>
+                            <th>ACC</th>
+                            <th>X</th>
+                            <th>Y</th>
+                            <th>Z</th>
+                        </thead>
+                    </table>
+
+                    <h4>Memory</h4>
+                    <table class="table table-striped">
+                    </table>
+
                     <h4>User Program Input</h4>
                     <textarea name="taProgramInput" id="taProgramInput" class="form-control" rows="8"></textarea>
 
@@ -99,9 +132,11 @@
         <footer class="container-fluid bg-primary text-center text-white">
             <div class="row">
                 <div class="col">
-                    <p>Made By <a href="https://johneletto.com" target="_blank" class="text-white text-underline"><u>John Eletto</u>.</a></p>
+                    <p>Made By <a href="https://johneletto.com" target="_blank" class="text-white text-underline"><u>John
+                                Eletto</u>.</a></p>
                     <p>Copyright &copy; 2018 No Rights Reserved.</p>
-                    <p>Reproduction is prohibited without the express written consent of Steve Jobs, Steve Wozniak and Bill
+                    <p>Reproduction is prohibited without the express written consent of Steve Jobs, Steve Wozniak and
+                        Bill
                         Gates. </p>
                 </div>
             </div>

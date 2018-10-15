@@ -109,6 +109,7 @@ module TSOS {
 
         private brk(): void {
             //Break (which is really a system call) 00 BRK 00 00
+            return;
         }
 
         private cpx(): void {
