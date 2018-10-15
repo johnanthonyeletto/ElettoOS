@@ -87,6 +87,7 @@ var TSOS;
             _Kernel = new TSOS.Kernel();
             _Kernel.krnBootstrap(); // _GLaDOS.afterStartup() will get called in there, if configured.
             TSOS.Control.updateMemoryDisplay();
+            TSOS.Control.updateCPUDisplay();
         };
         Control.hostBtnHaltOS_click = function (btn) {
             Control.hostLog("Emergency halt", "host");
@@ -114,13 +115,32 @@ var TSOS;
                     if (j % 8 == 0) {
                         row = table.insertRow();
                         var titleCell = row.insertCell();
-                        titleCell.innerHTML = ((i + 1) * j).toString(16).toUpperCase();
+                        titleCell.innerHTML = "0x" + (((i + 1) * j).toString(16).toUpperCase());
                         titleCell.style.fontWeight = "bold";
                     }
                     var cell = row.insertCell();
                     cell.innerHTML = _Memory.memoryArray[i][j];
                 }
             }
+        };
+        Control.updateCPUDisplay = function () {
+            var table = document.getElementById('cpuTable');
+            var tableBody = document.getElementById('cpuTableBody');
+            tableBody.innerHTML = "";
+            var row = table.insertRow();
+            var cell;
+            cell = row.insertCell();
+            cell.innerHTML = _CPU.PC;
+            cell = row.insertCell();
+            cell.innerHTML = "00";
+            cell = row.insertCell();
+            cell.innerHTML = _CPU.Acc;
+            cell = row.insertCell();
+            cell.innerHTML = _CPU.Xreg;
+            cell = row.insertCell();
+            cell.innerHTML = _CPU.Yreg;
+            cell = row.insertCell();
+            cell.innerHTML = _CPU.Zflag;
         };
         return Control;
     }());
