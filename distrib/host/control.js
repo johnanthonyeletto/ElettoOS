@@ -86,6 +86,7 @@ var TSOS;
             // .. and call the OS Kernel Bootstrap routine.
             _Kernel = new TSOS.Kernel();
             _Kernel.krnBootstrap(); // _GLaDOS.afterStartup() will get called in there, if configured.
+            TSOS.Control.updateMemoryDisplay();
         };
         Control.hostBtnHaltOS_click = function (btn) {
             Control.hostLog("Emergency halt", "host");
@@ -103,6 +104,23 @@ var TSOS;
             // That boolean parameter is the 'forceget' flag. When it is true it causes the page to always
             // be reloaded from the server. If it is false or not specified the browser may reload the
             // page from its cache, which is not what we want.
+        };
+        Control.updateMemoryDisplay = function () {
+            var table = document.getElementById('memoryTable');
+            table.innerHTML = "";
+            var row;
+            for (var i = 0; i < _Memory.memoryArray.length; i++) {
+                for (var j = 0; j < _Memory.memoryArray[i].length; j++) {
+                    if (j % 8 == 0) {
+                        row = table.insertRow();
+                        var titleCell = row.insertCell();
+                        titleCell.innerHTML = ((i + 1) * j).toString(16).toUpperCase();
+                        titleCell.style.fontWeight = "bold";
+                    }
+                    var cell = row.insertCell();
+                    cell.innerHTML = _Memory.memoryArray[i][j];
+                }
+            }
         };
         return Control;
     }());

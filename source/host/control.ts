@@ -41,11 +41,11 @@ module TSOS {
 
             // Clear the log text box.
             // Use the TypeScript cast to HTMLInputElement
-            (<HTMLInputElement> document.getElementById("taHostLog")).value="";
+            (<HTMLInputElement>document.getElementById("taHostLog")).value = "";
 
             // Set focus on the start button.
             // Use the TypeScript cast to HTMLInputElement
-            (<HTMLInputElement> document.getElementById("btnStartOS")).focus();
+            (<HTMLInputElement>document.getElementById("btnStartOS")).focus();
 
             // Check for our testing and enrichment core, which
             // may be referenced here (from index.html) as function Glados().
@@ -65,10 +65,10 @@ module TSOS {
             var now: number = new Date().getTime();
 
             // Build the log string.
-            var str: string = "({ clock:" + clock + ", source:" + source + ", msg:" + msg + ", now:" + now  + " })"  + "\n";
+            var str: string = "({ clock:" + clock + ", source:" + source + ", msg:" + msg + ", now:" + now + " })" + "\n";
 
             // Update the log console.
-            var taLog = <HTMLInputElement> document.getElementById("taHostLog");
+            var taLog = <HTMLInputElement>document.getElementById("taHostLog");
             taLog.value = str + taLog.value;
 
             // TODO in the future: Optionally update a log database or some streaming service.
@@ -106,6 +106,8 @@ module TSOS {
             // .. and call the OS Kernel Bootstrap routine.
             _Kernel = new Kernel();
             _Kernel.krnBootstrap();  // _GLaDOS.afterStartup() will get called in there, if configured.
+
+            TSOS.Control.updateMemoryDisplay();
         }
 
         public static hostBtnHaltOS_click(btn): void {
@@ -127,6 +129,26 @@ module TSOS {
             // That boolean parameter is the 'forceget' flag. When it is true it causes the page to always
             // be reloaded from the server. If it is false or not specified the browser may reload the
             // page from its cache, which is not what we want.
+        }
+
+        public static updateMemoryDisplay(): void {
+            var table = (<HTMLTableElement>document.getElementById('memoryTable'));
+            table.innerHTML = "";
+
+            var row;
+            for (var i = 0; i < _Memory.memoryArray.length; i++) {
+                for (var j = 0; j < _Memory.memoryArray[i].length; j++) {
+                    if (j % 8 == 0) {
+                        row = table.insertRow();
+                        var titleCell = row.insertCell();
+                        titleCell.innerHTML = ((i + 1) * j).toString(16).toUpperCase();
+                        titleCell.style.fontWeight = "bold";
+                    }
+                    var cell = row.insertCell();
+                    cell.innerHTML = _Memory.memoryArray[i][j];
+
+                }
+            }
         }
     }
 }

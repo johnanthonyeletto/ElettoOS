@@ -29,3 +29,8 @@
   width: 500px;
   margin: 0 auto;
 }
+
+#memoryContainer{
+  max-height: 300px;
+  overflow: scroll;
+}
