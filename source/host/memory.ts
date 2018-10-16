@@ -19,11 +19,8 @@ module TSOS {
         ) { }
 
         public init(): void {
-            for (var i = 0; i < 3; i++) {
-                this.memoryArray[i] = [];
-                for (var j = 0; j < 256; j++) {
-                    this.memoryArray[i][j] = "00";
-                }
+            for (var i = 0; i < 768; i++) {
+                this.memoryArray[i] = "00";
             }
         }
     }

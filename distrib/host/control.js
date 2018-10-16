@@ -111,16 +111,14 @@ var TSOS;
             table.innerHTML = "";
             var row;
             for (var i = 0; i < _Memory.memoryArray.length; i++) {
-                for (var j = 0; j < _Memory.memoryArray[i].length; j++) {
-                    if (j % 8 == 0) {
-                        row = table.insertRow();
-                        var titleCell = row.insertCell();
-                        titleCell.innerHTML = "0x" + (((i + 1) * j).toString(16).toUpperCase());
-                        titleCell.style.fontWeight = "bold";
-                    }
-                    var cell = row.insertCell();
-                    cell.innerHTML = _Memory.memoryArray[i][j];
+                if (i % 8 == 0) {
+                    row = table.insertRow();
+                    var titleCell = row.insertCell();
+                    titleCell.innerHTML = "0x" + (i).toString(16).toUpperCase();
+                    titleCell.style.fontWeight = "bold";
                 }
+                var cell = row.insertCell();
+                cell.innerHTML = _Memory.memoryArray[i];
             }
         };
         Control.updateCPUDisplay = function () {

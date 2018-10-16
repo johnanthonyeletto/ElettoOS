@@ -5,8 +5,11 @@ var TSOS;
         function MemoryAccessor() {
         }
         MemoryAccessor.prototype.read = function (address) {
+            return _Memory.memoryArray[parseInt(address, 16)];
         };
         MemoryAccessor.prototype.write = function (address, value) {
+            _Memory.memoryArray[parseInt(address, 16)] = value;
+            TSOS.Control.updateMemoryDisplay();
         };
         return MemoryAccessor;
     }());

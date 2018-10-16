@@ -5,12 +5,13 @@ module TSOS {
 
         constructor() { }
 
-        public read(address) {
-
+        public read(address): string {
+            return _Memory.memoryArray[parseInt(address, 16)];
         }
 
-        public write(address, value) {
-
+        public write(address, value): void {
+            _Memory.memoryArray[parseInt(address, 16)] = value;
+            TSOS.Control.updateMemoryDisplay();
         }
     }
 }
