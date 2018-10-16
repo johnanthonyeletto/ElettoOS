@@ -36,7 +36,6 @@ module TSOS {
             var foundProcess = null;
             for (var i = 0; i < this.residentQueue.getSize(); i++) {
                 var currentProcess = this.residentQueue.dequeue();
-                console.log(currentProcess);
                 if (currentProcess.PID == pid) {
                     // Process Was Found
                     foundProcess = currentProcess;
