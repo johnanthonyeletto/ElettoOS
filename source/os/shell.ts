@@ -416,7 +416,8 @@ module TSOS {
                 // validate hex
                 var hexRegex = new RegExp("^[0-9A-F ]+$");
 
-                var input = (<HTMLInputElement>document.getElementById("taProgramInput")).value;
+                // REGEX replaces multiple spaces with just one space. This help on .split()
+                var input = (<HTMLInputElement>document.getElementById("taProgramInput")).value.replace(/ +(?= )/g, '').trim();
 
                 if (hexRegex.test(input)) {
 

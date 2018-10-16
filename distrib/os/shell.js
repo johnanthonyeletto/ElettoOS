@@ -345,7 +345,8 @@ var TSOS;
             else {
                 // validate hex
                 var hexRegex = new RegExp("^[0-9A-F ]+$");
-                var input = document.getElementById("taProgramInput").value;
+                // REGEX replaces multiple spaces with just one space. This help on .split()
+                var input = document.getElementById("taProgramInput").value.replace(/ +(?= )/g, '').trim();
                 if (hexRegex.test(input)) {
                     document.getElementById("taProgramInput").style.backgroundColor = "#C8E6C9";
                     var commands = input.split(" ");

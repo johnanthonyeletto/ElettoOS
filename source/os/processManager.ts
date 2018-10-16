@@ -50,6 +50,7 @@ module TSOS {
                 return;
             }
 
+            foundProcess.state = "Ready";
             this.readyQueue.enqueue(foundProcess);
         }
     }
