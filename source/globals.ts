@@ -50,6 +50,7 @@ var _KernelInputQueue: any = null;  // Is this better? I don't like uninitialize
 var _KernelBuffers: any[] = null;   // when clearly 'any' is not what we want. There is likely a better way, but what is it?
 
 var _MemoryManager: any = null;
+var _ProcessManager: any = null;
 
 // Standard input and output
 var _StdIn;    // Same "to null or not to null" issue as above.

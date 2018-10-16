@@ -5,15 +5,24 @@ module TSOS {
 
         public PID;
         public PC;
-        public IR;
+        public Partition;
         public ACC;
         public XReg;
         public YReg;
         public ZFlag;
         public Priority;
         public State;
-        public Lcoation;
+        public Location;
         
-        constructor() { }
+        constructor() { 
+            this.PC = 0;
+            this.ACC = 0;
+            this.XReg = 0;
+            this.YReg = 0;
+            this.ZFlag = 0;
+            this.Priority = 0;
+            this.State = "Resident";
+            this.Location = "Memory";
+        }
     }
 }

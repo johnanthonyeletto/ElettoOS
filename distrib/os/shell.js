@@ -86,6 +86,9 @@ var TSOS;
             // load
             sc = new TSOS.ShellCommand(this.shellLoad, "load", " - Loads hex program.");
             this.commandList[this.commandList.length] = sc;
+            // run
+            sc = new TSOS.ShellCommand(this.shellRun, "run", " <PID> - Runs program from memory.");
+            this.commandList[this.commandList.length] = sc;
             // fail
             sc = new TSOS.ShellCommand(this.shellFail, "fail", " - Causes the OS to fail.");
             this.commandList[this.commandList.length] = sc;
@@ -346,23 +349,32 @@ var TSOS;
                 if (hexRegex.test(input)) {
                     document.getElementById("taProgramInput").style.backgroundColor = "#C8E6C9";
                     var commands = input.split(" ");
-                    if (commands.length > 256) {
-                        _StdOut.putText("Program Too Large For Memory");
+                    try {
+                        var process = _ProcessManager.createProcess(commands);
+                        _StdOut.putText("Program loaded. PID - " + process.PID);
+                    }
+                    catch (error) {
+                        _StdOut.putText(error.message);
                         return;
                     }
-                    else {
-                        var partition = _MemoryManager.getPartition();
-                        _MemoryManager.loadProgram(commands, partition);
-                    }
-                    // for (var i = 0; i < commands.length; i++) {
-                    //     _MemoryAccessor.write((i).toString(16), commands[i]);
-                    // }
-                    _StdOut.putText("Program loaded. PID - 0");
                 }
                 else {
                     _StdOut.putText("Invalid Hex.");
                     document.getElementById("taProgramInput").style.backgroundColor = "#FFCDD2";
                 }
+            }
+        };
+        Shell.prototype.shellRun = function (args) {
+            if (args.length < 1 || args.length > 1) {
+                _StdOut.putText("Usage: run <PID> - run need exactly 1 arg.");
+                return;
+            }
+            try {
+                _ProcessManager.runProcess(args[0]);
+            }
+            catch (error) {
+                _StdOut.putText(error.message);
+                return;
             }
         };
         Shell.prototype.shellFail = function (args) {

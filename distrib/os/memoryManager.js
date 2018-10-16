@@ -7,6 +7,13 @@ var TSOS;
         MemoryManager.prototype.getPartition = function () {
             return 0;
         };
+        MemoryManager.prototype.clearPartition = function (partition) {
+            var start = partition * 256;
+            var end = start + 256;
+            for (var i = start; i < end; i++) {
+                _MemoryAccessor.write(i.toString(16), "00");
+            }
+        };
         MemoryManager.prototype.loadProgram = function (opCodes, partition) {
             var start = partition * 256;
             var end = start + 256;

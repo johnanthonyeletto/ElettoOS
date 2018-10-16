@@ -17,7 +17,7 @@ module TSOS {
             return this.q.length;
         }
 
-        public isEmpty(){
+        public isEmpty() {
             return (this.q.length == 0);
         }
 
@@ -31,6 +31,10 @@ module TSOS {
                 retVal = this.q.shift();
             }
             return retVal;
+        }
+
+        public peek(index) {
+            return this.q[index];
         }
 
         public toString() {
