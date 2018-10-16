@@ -413,9 +413,24 @@ module TSOS {
                 var input = (<HTMLInputElement>document.getElementById("taProgramInput")).value;
 
                 if (hexRegex.test(input)) {
-                    _StdOut.putText("Valid Hex.");
+
                     document.getElementById("taProgramInput").style.backgroundColor = "#C8E6C9";
 
+                    var commands = input.split(" ");
+
+                    if (commands.length > 256) {
+                        _StdOut.putText("Program Too Large For Memory");
+                        return;
+                    } else {
+                        var partition = _MemoryManager.getPartition();
+                        _MemoryManager.loadProgram(commands, partition);
+                    }
+
+                    // for (var i = 0; i < commands.length; i++) {
+                    //     _MemoryAccessor.write((i).toString(16), commands[i]);
+                    // }
+
+                    _StdOut.putText("Program loaded. PID - 0");
                 } else {
                     _StdOut.putText("Invalid Hex.");
                     document.getElementById("taProgramInput").style.backgroundColor = "#FFCDD2";
