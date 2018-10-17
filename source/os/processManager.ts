@@ -52,6 +52,7 @@ module TSOS {
 
             foundProcess.state = "Ready";
             this.readyQueue.enqueue(foundProcess);
+            _CPU.isExecuting = true;
         }
     }
 }
