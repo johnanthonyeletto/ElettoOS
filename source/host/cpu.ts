@@ -187,9 +187,9 @@ module TSOS {
 
         private bne(): void {
             //Branch n bytes if Z flag = 0 D0 BNE D0 $EF D0 EF
-            var branch = parseInt(_MemoryAccessor.read((this.PC + 1).toString(16)), 16);
+            var branch = parseInt(_MemoryAccessor.read((this.PC + 1).toString(16)), 16) % 256;
             if (this.Zflag == 0) {
-                this.PC += branch;
+                this.PC += (branch + 2);
             } else {
                 this.PC += 2;
             }
@@ -198,7 +198,13 @@ module TSOS {
 
         private inc(): void {
             //Increment the value of a byte EE INC EE $0021 EE 21 00
-            this.PC += 2;
+            var memoryAddress = _MemoryAccessor.read((this.PC + 2).toString(16)) + _MemoryAccessor.read((this.PC + 1).toString(16));
+
+            var value = parseInt(_MemoryAccessor.read(memoryAddress));
+
+            _MemoryAccessor.write(memoryAddress, (value + 1).toString(16));
+
+            this.PC += 3;
         }
 
         private sys(): void {
@@ -207,21 +213,19 @@ module TSOS {
             //#$02 in X reg = print the 00-terminated string stored at the address in
             //the Y register.
             if (this.Xreg == 1) {
-                _StdOut.putText(this.Yreg.toString());
+                _StdOut.putText(this.Yreg.toString() + " ");
             } else {
                 var address = this.Yreg;
                 var string = "";
                 // Gets the ASCII from the address, converts it to characters, then passes to console's putText.
                 while (_MemoryAccessor.read(address.toString(16)) != "00") {
-                    var ascii = _MemoryAccessor.read(address.toString(16));
-                    // Convert hex to decimal
-                    var dec = parseInt(ascii.toString(), 16);
-                    var chr = String.fromCharCode(dec);
-                    string += chr;
+
+                    var dec = parseInt(_MemoryAccessor.read(address.toString(16)), 16);
+                    string += String.fromCharCode(dec);
                     address++;
                 }
 
-                _StdOut.putText(string);
+                _StdOut.putText(string + " ");
             }
 
             this.PC++;
