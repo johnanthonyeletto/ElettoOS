@@ -173,12 +173,27 @@ module TSOS {
         private cpx(): void {
             //Compare a byte in memory to the X reg EC CPX EC $0010 EC 10 00
             //Sets the Z (zero) flag if equal
-            this.PC += 2;
+            var memoryAddress = _MemoryAccessor.read((this.PC + 2).toString(16)) + _MemoryAccessor.read((this.PC + 1).toString(16));
+            var memoryValue = parseInt(_MemoryAccessor.read(memoryAddress), 16);
+
+            if (this.Xreg == memoryValue) {
+                this.Zflag = 1;
+            } else {
+                this.Zflag = 0;
+            }
+
+            this.PC += 3;
         }
 
         private bne(): void {
             //Branch n bytes if Z flag = 0 D0 BNE D0 $EF D0 EF
-            this.PC += 2;
+            var branch = parseInt(_MemoryAccessor.read((this.PC + 1).toString(16)), 16);
+            if (this.Zflag == 0) {
+                this.PC += branch;
+            } else {
+                this.PC += 2;
+            }
+
         }
 
         private inc(): void {
