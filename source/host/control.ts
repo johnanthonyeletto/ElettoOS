@@ -151,9 +151,14 @@ module TSOS {
 
         public static updateCPUDisplay(): void {
             var table = (<HTMLTableElement>document.getElementById('cpuTable'));
-            var tableBody = (<HTMLTableElement>document.getElementById('cpuTableBody'));
+            var tableBody = (document.getElementById('cpuTableBody'));
 
             tableBody.innerHTML = "";
+
+            while (table.rows.length > 1) {
+                table.deleteRow(table.rows.length - 1);
+            }
+
             var row = table.insertRow();
 
             var cell;
@@ -162,7 +167,7 @@ module TSOS {
             cell.innerHTML = _CPU.PC;
 
             cell = row.insertCell();
-            cell.innerHTML = "00";
+            cell.innerHTML = _CPU.IR;
 
             cell = row.insertCell();
             cell.innerHTML = _CPU.Acc;

@@ -26,6 +26,7 @@ module TSOS {
             public Xreg: number = 0,
             public Yreg: number = 0,
             public Zflag: number = 0,
+            public IR: string = "00",
             public isExecuting: boolean = false) {
 
         }
@@ -42,9 +43,8 @@ module TSOS {
         public cycle(): void {
             _Kernel.krnTrace('CPU cycle');
 
-            var opCode = _MemoryAccessor.read(this.PC.toString(16));
-
-            switch (opCode) {
+            this.IR = _MemoryAccessor.read(this.PC.toString(16));
+            switch (this.IR) {
                 case "A9":
                     this.ldaConstant();
                     break;
@@ -89,6 +89,8 @@ module TSOS {
                     this.sys();
                     break;
             }
+
+            TSOS.Control.updateCPUDisplay();
         }
 
 
@@ -99,17 +101,22 @@ module TSOS {
             //Load the accumulator with a constant A9 LDA LDA #$07 A9 07
             this.Acc = parseInt(_MemoryAccessor.read((this.PC + 1).toString(16)), 16);
             this.PC += 2;
-            this.brk();
         }
 
         private ldaMemory(): void {
             //Load the accumulator from memory AD LDA LDA $0010 AD 10 00
-            this.PC += 2;
+            var memoryAddress = _MemoryAccessor.read((this.PC + 2).toString(16)) + _MemoryAccessor.read((this.PC + 1).toString(16));
+
+            this.Acc = parseInt(_MemoryAccessor.read(memoryAddress), 16);
+
+            this.PC += 3;
         }
 
         private sta(): void {
             //Store the accumulator in memory 8D STA STA $0010 8D 10 00
-            this.PC += 2;
+            var memoryAddress = _MemoryAccessor.read((this.PC + 2).toString(16)) + _MemoryAccessor.read((this.PC + 1).toString(16));
+            _MemoryAccessor.write(memoryAddress, this.Acc.toString(16));
+            this.PC += 3;
         }
 
         private acd(): void {
@@ -117,28 +124,39 @@ module TSOS {
             //Adds contents of an address to
             //the contents of the accumulator and
             //keeps the result in the accumulator
+            var memoryAddress = _MemoryAccessor.read((this.PC + 2).toString(16)) + _MemoryAccessor.read((this.PC + 1).toString(16));
 
-            this.PC += 2;
+            this.Acc += parseInt(_MemoryAccessor.read(memoryAddress), 16);
+            this.PC += 3;
         }
 
         private ldxConstant(): void {
             //Load the X register with a constant A2 LDX LDX #$01 A2 01
+            this.Xreg = parseInt(_MemoryAccessor.read((this.PC + 1).toString(16)), 16);
             this.PC += 2;
         }
 
         private ldxMemory(): void {
             //Load the X register from memory AE LDX LDX $0010 AE 10 00
-            this.PC += 2;
+
+            var memoryAddress = _MemoryAccessor.read((this.PC + 2).toString(16)) + _MemoryAccessor.read((this.PC + 1).toString(16));
+
+            this.Xreg = parseInt(_MemoryAccessor.read(memoryAddress), 16);
+            this.PC += 3;
         }
 
         private ldyConstant(): void {
             //Load the Y register with a constant A0 LDY LDY #$04 A0 04
+            this.Yreg = parseInt(_MemoryAccessor.read((this.PC + 1).toString(16)), 16);
             this.PC += 2;
         }
 
         private ldyMemory(): void {
             //Load the Y register from memory AC LDY LDY $0010 AC 10 00
-            this.PC += 2;
+            var memoryAddress = _MemoryAccessor.read((this.PC + 2).toString(16)) + _MemoryAccessor.read((this.PC + 1).toString(16));
+
+            this.Yreg = parseInt(_MemoryAccessor.read(memoryAddress), 16);
+            this.PC += 3;
         }
 
         private nop(): void {
@@ -173,6 +191,24 @@ module TSOS {
             //#$01 in X reg = print the integer stored in the Y register.
             //#$02 in X reg = print the 00-terminated string stored at the address in
             //the Y register.
+            if (this.Xreg == 1) {
+                _StdOut.putText(this.Yreg.toString());
+            } else {
+                var address = this.Yreg;
+                var string = "";
+                // Gets the ASCII from the address, converts it to characters, then passes to console's putText.
+                while (_MemoryAccessor.read(address.toString(16)) != "00") {
+                    var ascii = _MemoryAccessor.read(address.toString(16));
+                    // Convert hex to decimal
+                    var dec = parseInt(ascii.toString(), 16);
+                    var chr = String.fromCharCode(dec);
+                    string += chr;
+                    address++;
+                }
+
+                _StdOut.putText(string);
+            }
+
             this.PC++;
         }
     }

@@ -123,14 +123,17 @@ var TSOS;
         };
         Control.updateCPUDisplay = function () {
             var table = document.getElementById('cpuTable');
-            var tableBody = document.getElementById('cpuTableBody');
+            var tableBody = (document.getElementById('cpuTableBody'));
             tableBody.innerHTML = "";
+            while (table.rows.length > 1) {
+                table.deleteRow(table.rows.length - 1);
+            }
             var row = table.insertRow();
             var cell;
             cell = row.insertCell();
             cell.innerHTML = _CPU.PC;
             cell = row.insertCell();
-            cell.innerHTML = "00";
+            cell.innerHTML = _CPU.IR;
             cell = row.insertCell();
             cell.innerHTML = _CPU.Acc;
             cell = row.insertCell();

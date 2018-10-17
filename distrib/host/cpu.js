@@ -17,18 +17,20 @@ var TSOS;
 (function (TSOS) {
     var Cpu = /** @class */ (function () {
         // http://www.labouseur.com/commondocs/6502alan-instruction-set.pdf
-        function Cpu(PC, Acc, Xreg, Yreg, Zflag, isExecuting) {
+        function Cpu(PC, Acc, Xreg, Yreg, Zflag, IR, isExecuting) {
             if (PC === void 0) { PC = 0; }
             if (Acc === void 0) { Acc = 0; }
             if (Xreg === void 0) { Xreg = 0; }
             if (Yreg === void 0) { Yreg = 0; }
             if (Zflag === void 0) { Zflag = 0; }
+            if (IR === void 0) { IR = "00"; }
             if (isExecuting === void 0) { isExecuting = false; }
             this.PC = PC;
             this.Acc = Acc;
             this.Xreg = Xreg;
             this.Yreg = Yreg;
             this.Zflag = Zflag;
+            this.IR = IR;
             this.isExecuting = isExecuting;
         }
         Cpu.prototype.init = function () {
@@ -41,8 +43,8 @@ var TSOS;
         };
         Cpu.prototype.cycle = function () {
             _Kernel.krnTrace('CPU cycle');
-            var opCode = _MemoryAccessor.read(this.PC.toString(16));
-            switch (opCode) {
+            this.IR = _MemoryAccessor.read(this.PC.toString(16));
+            switch (this.IR) {
                 case "A9":
                     this.ldaConstant();
                     break;
@@ -86,44 +88,56 @@ var TSOS;
                     this.sys();
                     break;
             }
+            TSOS.Control.updateCPUDisplay();
         };
         // USE PARSEINT(VALUE, 16) TO CONVERT TO DECIMAL
         Cpu.prototype.ldaConstant = function () {
             //Load the accumulator with a constant A9 LDA LDA #$07 A9 07
             this.Acc = parseInt(_MemoryAccessor.read((this.PC + 1).toString(16)), 16);
             this.PC += 2;
-            this.brk();
         };
         Cpu.prototype.ldaMemory = function () {
             //Load the accumulator from memory AD LDA LDA $0010 AD 10 00
-            this.PC += 2;
+            var memoryAddress = _MemoryAccessor.read((this.PC + 2).toString(16)) + _MemoryAccessor.read((this.PC + 1).toString(16));
+            this.Acc = parseInt(_MemoryAccessor.read(memoryAddress), 16);
+            this.PC += 3;
         };
         Cpu.prototype.sta = function () {
             //Store the accumulator in memory 8D STA STA $0010 8D 10 00
-            this.PC += 2;
+            var memoryAddress = _MemoryAccessor.read((this.PC + 2).toString(16)) + _MemoryAccessor.read((this.PC + 1).toString(16));
+            _MemoryAccessor.write(memoryAddress, this.Acc.toString(16));
+            this.PC += 3;
         };
         Cpu.prototype.acd = function () {
             //Add with carry 6D ADC ADC $0010 6D 10 00
             //Adds contents of an address to
             //the contents of the accumulator and
             //keeps the result in the accumulator
-            this.PC += 2;
+            var memoryAddress = _MemoryAccessor.read((this.PC + 2).toString(16)) + _MemoryAccessor.read((this.PC + 1).toString(16));
+            this.Acc += parseInt(_MemoryAccessor.read(memoryAddress), 16);
+            this.PC += 3;
         };
         Cpu.prototype.ldxConstant = function () {
             //Load the X register with a constant A2 LDX LDX #$01 A2 01
+            this.Xreg = parseInt(_MemoryAccessor.read((this.PC + 1).toString(16)), 16);
             this.PC += 2;
         };
         Cpu.prototype.ldxMemory = function () {
             //Load the X register from memory AE LDX LDX $0010 AE 10 00
-            this.PC += 2;
+            var memoryAddress = _MemoryAccessor.read((this.PC + 2).toString(16)) + _MemoryAccessor.read((this.PC + 1).toString(16));
+            this.Xreg = parseInt(_MemoryAccessor.read(memoryAddress), 16);
+            this.PC += 3;
         };
         Cpu.prototype.ldyConstant = function () {
             //Load the Y register with a constant A0 LDY LDY #$04 A0 04
+            this.Yreg = parseInt(_MemoryAccessor.read((this.PC + 1).toString(16)), 16);
             this.PC += 2;
         };
         Cpu.prototype.ldyMemory = function () {
             //Load the Y register from memory AC LDY LDY $0010 AC 10 00
-            this.PC += 2;
+            var memoryAddress = _MemoryAccessor.read((this.PC + 2).toString(16)) + _MemoryAccessor.read((this.PC + 1).toString(16));
+            this.Yreg = parseInt(_MemoryAccessor.read(memoryAddress), 16);
+            this.PC += 3;
         };
         Cpu.prototype.nop = function () {
             //No Operation EA NOP EA EA
@@ -152,6 +166,23 @@ var TSOS;
             //#$01 in X reg = print the integer stored in the Y register.
             //#$02 in X reg = print the 00-terminated string stored at the address in
             //the Y register.
+            if (this.Xreg == 1) {
+                _StdOut.putText(this.Yreg.toString());
+            }
+            else {
+                var address = this.Yreg;
+                var string = "";
+                // Gets the ASCII from the address, converts it to characters, then passes to console's putText.
+                while (_MemoryAccessor.read(address.toString(16)) != "00") {
+                    var ascii = _MemoryAccessor.read(address.toString(16));
+                    // Convert hex to decimal
+                    var dec = parseInt(ascii.toString(), 16);
+                    var chr = String.fromCharCode(dec);
+                    string += chr;
+                    address++;
+                }
+                _StdOut.putText(string);
+            }
             this.PC++;
         };
         return Cpu;
