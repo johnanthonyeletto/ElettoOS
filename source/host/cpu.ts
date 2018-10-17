@@ -217,7 +217,6 @@ module TSOS {
             } else {
                 var address = this.Yreg;
                 var string = "";
-                // Gets the ASCII from the address, converts it to characters, then passes to console's putText.
                 while (_MemoryAccessor.read(address.toString(16)) != "00") {
 
                     var dec = parseInt(_MemoryAccessor.read(address.toString(16)), 16);
