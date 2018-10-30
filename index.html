@@ -94,7 +94,7 @@
                 </div>
                 <div class="col-md">
                     <h4>Processes</h4>
-                    <table class="table striped">
+                    <table class="table table-striped" id="processTable" style="table-layout:fixed;">
                         <thead>
                             <th>PID</th>
                             <th>Segment</th>
@@ -106,10 +106,12 @@
                             <th>State</th>
                             <th>Location</th>
                         </thead>
+                        <tbody id="processTableBody">
+                        </tbody>
                     </table>
 
                     <h4>CPU</h4>
-                    <table class="table striped" id="cpuTable">
+                    <table class="table" id="cpuTable">
                         <thead>
                             <th>PC</th>
                             <th>IR</th>
@@ -131,6 +133,11 @@
                     </div>
 
                     <h4>User Program Input</h4>
+                    <div class="btn-group" role="group" aria-label="Load Code">
+                        <button type="button" class="btn btn-sm btn-primary" onclick="TSOS.Control.hostBtnFill12DONE_Click(this)">1
+                            2 DONE</button>
+                        <button type="button" class="btn btn-sm btn-primary" onclick="TSOS.Control.hostBtnFillLoops_Click(this)">Loops</button>
+                    </div>
                     <textarea name="taProgramInput" id="taProgramInput" class="form-control" rows="8"></textarea>
 
                 </div>

@@ -132,6 +132,16 @@ module TSOS {
             // page from its cache, which is not what we want.
         }
 
+        public static hostBtnFill12DONE_Click(btn): void {
+            var textArea = (document.getElementById('taProgramInput'));
+            textArea.innerHTML = "A9 03 8D 41 00 A9 01 8D 40 00 AC 40 00 A2 01 FF EE 40 00 AE 40 00 EC 41 00 D0 EF A9 44 8D 42 00 A9 4F 8D 43 00 A9 4E 8D 44 00 A9 45 8D 45 00 A9 00 8D 46 00 A2 02 A0 42 FF 00";
+        }
+
+        public static hostBtnFillLoops_Click(btn): void {
+            var textArea = (document.getElementById('taProgramInput'));
+            textArea.innerHTML = "A9 00 8D EC 00 A9 00 8D EC 00 A9 00 8D ED 00 A9 00 8D ED 00 A9 00 8D EE 00 A9 00 8D EF 00 AD ED 00 8D FF 00 AE FF 00 A9 00 8D FF 00 EC FF 00 D0 BA AD EC 00 8D FF 00 A9 01 6D FF 00 8D EC 00 AD EC 00 8D FF 00 AE FF 00 A9 03 8D FF 00 EC FF 00 D0 05 A9 01 8D ED 00 A9 00 8D EE 00 A9 00 8D EF 00 AD EF 00 8D FF 00 AE FF 00 A9 00 8D FF 00 EC FF 00 D0 49 AD EE 00 8D FF 00 A9 01 6D FF 00 8D EE 00 AD EE 00 8D FF 00 AE FF 00 A9 02 8D FF 00 EC FF 00 D0 05 A9 01 8D EF 00 A9 F8 8D FF 00 A2 02 AC FF 00 FF AD EE 00 A2 01 8D FF 00 AC FF 00 FF A9 00 8D FF 00 A2 01 EC FF 00 D0 A4 A9 F1 8D FF 00 A2 02 AC FF 00 FF AD EC 00 A2 01 8D FF 00 AC FF 00 FF A9 EE 8D FF 00 A2 02 AC FF 00 FF A9 00 8D FF 00 A2 01 EC FF 00 D0 33 00 00 00 20 20 00 20 6F 75 74 65 72 00 20 69 6E 6E 65 72 00 00";
+        }
+
         public static updateMemoryDisplay(): void {
             var table = (<HTMLTableElement>document.getElementById('memoryTable'));
             table.innerHTML = "";
@@ -180,6 +190,124 @@ module TSOS {
 
             cell = row.insertCell();
             cell.innerHTML = _CPU.Zflag;
+        }
+
+        public static updateProcessDisplay(): void {
+            var table = (<HTMLTableElement>document.getElementById('processTable'));
+            var tableBody = (document.getElementById('processTableBody'));
+
+            tableBody.innerHTML = "";
+
+            while (table.rows.length > 1) {
+                table.deleteRow(table.rows.length - 1);
+            }
+
+            if (_ProcessManager.running != null) {
+                var row = table.insertRow();
+
+                var cell;
+
+                cell = row.insertCell();
+                cell.innerHTML = _ProcessManager.running.PID;
+
+                cell = row.insertCell();
+                cell.innerHTML = "1";
+
+                cell = row.insertCell();
+                cell.innerHTML = _ProcessManager.running.PC;
+
+                cell = row.insertCell();
+                cell.innerHTML = _ProcessManager.running.Acc;
+
+                cell = row.insertCell();
+                cell.innerHTML = _ProcessManager.running.Xreg;
+
+                cell = row.insertCell();
+                cell.innerHTML = _ProcessManager.running.Yreg;
+
+                cell = row.insertCell();
+                cell.innerHTML = _ProcessManager.running.Zflag;
+
+                cell = row.insertCell();
+                cell.innerHTML = _ProcessManager.running.State;
+
+                cell = row.insertCell();
+                cell.innerHTML = _ProcessManager.running.Location;
+            }
+
+            for (var i = 0; i < _ProcessManager.readyQueue.getSize(); i++) {
+                var currentProcess = _ProcessManager.readyQueue.dequeue();
+
+                var row = table.insertRow();
+
+                var cell;
+
+                cell = row.insertCell();
+                cell.innerHTML = currentProcess.PID;
+
+                cell = row.insertCell();
+                cell.innerHTML = "1";
+
+                cell = row.insertCell();
+                cell.innerHTML = currentProcess.PC;
+
+                cell = row.insertCell();
+                cell.innerHTML = currentProcess.Acc;
+
+                cell = row.insertCell();
+                cell.innerHTML = currentProcess.Xreg;
+
+                cell = row.insertCell();
+                cell.innerHTML = currentProcess.Yreg;
+
+                cell = row.insertCell();
+                cell.innerHTML = currentProcess.Zflag;
+
+                cell = row.insertCell();
+                cell.innerHTML = currentProcess.State;
+
+                cell = row.insertCell();
+                cell.innerHTML = currentProcess.Location;
+
+                _ProcessManager.readyQueue.enqueue(currentProcess);
+            }
+
+            for (var i = 0; i < _ProcessManager.residentQueue.getSize(); i++) {
+                var currentProcess = _ProcessManager.residentQueue.dequeue();
+
+                var row = table.insertRow();
+
+                var cell;
+
+                cell = row.insertCell();
+                cell.innerHTML = currentProcess.PID;
+
+                cell = row.insertCell();
+                cell.innerHTML = "1";
+
+                cell = row.insertCell();
+                cell.innerHTML = currentProcess.PC;
+
+                cell = row.insertCell();
+                cell.innerHTML = currentProcess.Acc;
+
+                cell = row.insertCell();
+                cell.innerHTML = currentProcess.Xreg;
+
+                cell = row.insertCell();
+                cell.innerHTML = currentProcess.Yreg;
+
+                cell = row.insertCell();
+                cell.innerHTML = currentProcess.Zflag;
+
+                cell = row.insertCell();
+                cell.innerHTML = currentProcess.State;
+
+                cell = row.insertCell();
+                cell.innerHTML = currentProcess.Location;
+
+                _ProcessManager.residentQueue.enqueue(currentProcess);
+            }
         }
     }
 }
