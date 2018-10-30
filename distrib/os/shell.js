@@ -92,6 +92,9 @@ var TSOS;
             // fail
             sc = new TSOS.ShellCommand(this.shellFail, "fail", " - Causes the OS to fail.");
             this.commandList[this.commandList.length] = sc;
+            // clearmem
+            sc = new TSOS.ShellCommand(this.shellClearMem, "clearmem", " - Clears all memory partitions.");
+            this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
             //
@@ -389,6 +392,16 @@ var TSOS;
             }
             else {
                 _Kernel.krnTrapError("OS Failed.");
+            }
+        };
+        Shell.prototype.shellClearMem = function (args) {
+            if (args.length > 0) {
+                _StdOut.putText("Usage: clearmem - clearmem does not take any args.");
+            }
+            else {
+                _MemoryManager.clearPartition(0);
+                _MemoryManager.clearPartition(1);
+                _MemoryManager.clearPartition(2);
             }
         };
         return Shell;
