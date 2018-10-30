@@ -163,13 +163,14 @@ var TSOS;
         };
         Cpu.prototype.bne = function () {
             //Branch n bytes if Z flag = 0 D0 BNE D0 $EF D0 EF
-            var branch = parseInt(_MemoryAccessor.read((this.PC + 1).toString(16)), 16) % 256;
+            var branch = parseInt(_MemoryAccessor.read((this.PC + 1).toString(16)), 16);
             if (this.Zflag == 0) {
-                this.PC += (branch + 2);
+                this.PC = (branch + 2) % 256;
             }
             else {
                 this.PC += 2;
             }
+            console.log(branch);
         };
         Cpu.prototype.inc = function () {
             //Increment the value of a byte EE INC EE $0021 EE 21 00
@@ -189,7 +190,6 @@ var TSOS;
             else {
                 var address = this.Yreg;
                 var string = "";
-                // Gets the ASCII from the address, converts it to characters, then passes to console's putText.
                 while (_MemoryAccessor.read(address.toString(16)) != "00") {
                     var dec = parseInt(_MemoryAccessor.read(address.toString(16)), 16);
                     string += String.fromCharCode(dec);

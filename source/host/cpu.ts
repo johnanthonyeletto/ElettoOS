@@ -187,12 +187,14 @@ module TSOS {
 
         private bne(): void {
             //Branch n bytes if Z flag = 0 D0 BNE D0 $EF D0 EF
-            var branch = parseInt(_MemoryAccessor.read((this.PC + 1).toString(16)), 16) % 256;
+            var branch = parseInt(_MemoryAccessor.read((this.PC + 1).toString(16)), 16);
             if (this.Zflag == 0) {
-                this.PC += (branch + 2);
+                this.PC = (branch + 2) % 256;
             } else {
                 this.PC += 2;
             }
+
+            console.log(branch);
 
         }
 
