@@ -127,6 +127,12 @@ module TSOS {
                 " - Clears all memory partitions.");
             this.commandList[this.commandList.length] = sc;
 
+            // ps
+            sc = new ShellCommand(this.shellPS,
+                "ps",
+                " - Displays a list of processes.");
+            this.commandList[this.commandList.length] = sc;
+
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
 
@@ -484,6 +490,21 @@ module TSOS {
                 _MemoryManager.clearPartition(0);
                 _MemoryManager.clearPartition(1);
                 _MemoryManager.clearPartition(2);
+            }
+        }
+
+        public shellPS(args) {
+            if (args.length > 0) {
+                _StdOut.putText("Usage: ps - ps does not take any args.");
+            }
+            else {
+                for (var i = 0; i < _ProcessManager.residentQueue.getSize(); i++) {
+                    var currentProcess = _ProcessManager.residentQueue.dequeue();
+                    _StdOut.putText("PID - " + currentProcess.PID);
+                    _StdOut.advanceLine();
+                    _ProcessManager.residentQueue.enqueue(currentProcess);
+
+                }
             }
         }
     }
