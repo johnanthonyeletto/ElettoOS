@@ -95,9 +95,18 @@ var TSOS;
             // UPDATE: Even though we are now working in TypeScript, char and string remain undistinguished.
             //         Consider fixing that.
             if (text !== "") {
+                var textArray;
+                if (text != " ") {
+                    textArray = text.split(" ");
+                }
+                else {
+                    textArray = [" "];
+                }
                 // Splitting string can allow us to draw the text word by word.
-                var textArray = text.split(" ");
                 for (var i = 0; i < textArray.length; i++) {
+                    if (textArray[i] == "") {
+                        continue;
+                    }
                     // Draw text word by word.
                     // If there's more than one thing in our array (meaning that there were spaces), we will add the space back in after each word. We won't add a space if it's the last word.
                     var word = (textArray.length > 1 || i != textArray.length - 1) ? textArray[i] + " " : textArray[i];

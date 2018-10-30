@@ -4,6 +4,7 @@ module TSOS {
     export class ProcessManager {
         public residentQueue;
         public readyQueue;
+        public running;
         private nextPID;
 
         constructor() {
@@ -52,6 +53,7 @@ module TSOS {
 
             foundProcess.state = "Ready";
             this.readyQueue.enqueue(foundProcess);
+            this.running = foundProcess;
             _CPU.isExecuting = true;
         }
     }

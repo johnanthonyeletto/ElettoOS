@@ -39,6 +39,7 @@ var TSOS;
             }
             foundProcess.state = "Ready";
             this.readyQueue.enqueue(foundProcess);
+            this.running = foundProcess;
             _CPU.isExecuting = true;
         };
         return ProcessManager;
