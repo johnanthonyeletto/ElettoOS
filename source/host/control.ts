@@ -164,7 +164,7 @@ module TSOS {
             var cell;
 
             cell = row.insertCell();
-            cell.innerHTML = _CPU.PC;
+            cell.innerHTML = _CPU.PC.toString(16).toUpperCase();
 
             cell = row.insertCell();
             cell.innerHTML = _CPU.IR;

@@ -53,8 +53,18 @@ module TSOS {
 
             foundProcess.state = "Ready";
             this.readyQueue.enqueue(foundProcess);
-            this.running = foundProcess;
+            this.updateRunning(foundProcess);
             _CPU.isExecuting = true;
+        }
+
+        public updateRunning(process): void {
+            this.running = process;
+            _CPU.PC = process.PC;
+            _CPU.Acc = process.ACC;
+            _CPU.Xreg = process.Xreg;
+            _CPU.Yreg = process.Yreg;
+            _CPU.Zflag = process.Zflag;
+            _CPU.IR = process.IR;
         }
     }
 }

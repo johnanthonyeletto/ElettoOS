@@ -9,6 +9,7 @@ var TSOS;
             this.YReg = 0;
             this.ZFlag = 0;
             this.Priority = 0;
+            this.IR = null;
             this.State = "Resident";
             this.Location = "Memory";
         }
