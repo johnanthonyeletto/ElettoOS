@@ -138,6 +138,11 @@ var TSOS;
                 else if (this.apologies.indexOf("[" + cmd + "]") >= 0) { // Check for apologies.
                     this.execute(this.shellApology);
                 }
+                else if (cmd == "") {
+                    // User just wants a new line.
+                    _StdOut.advanceLine();
+                    _StdOut.putText(_OsShell.promptStr);
+                }
                 else { // It's just a bad command. {
                     this.execute(this.shellInvalidCommand);
                 }

@@ -58,6 +58,19 @@ module TSOS {
         }
 
         public updateRunning(process): void {
+
+            // Save state of current running process and put it back on the ready queue.
+            if (this.running != null) {
+                this.running.PC = _CPU.PC;
+                this.running.ACC = _CPU.Acc;
+                this.running.Xreg = _CPU.Xreg;
+                this.running.Yreg = _CPU.Yreg;
+                this.running.Zflag = _CPU.Zflag;
+                this.running.IR = _CPU.IR;
+                this.readyQueue.enqueue(this.running);
+            }
+
+            // Start running new process;
             this.running = process;
             _CPU.PC = process.PC;
             _CPU.Acc = process.ACC;
