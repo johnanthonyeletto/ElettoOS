@@ -19,6 +19,11 @@ module TSOS {
             }
 
             var partition = _MemoryManager.getPartition();
+            if (partition == null) {
+                throw new Error("Out of memory.");
+                return;
+            }
+
             _MemoryManager.loadProgram(opCodes, partition);
 
             var pcb = new ProcessControlBlock();

@@ -12,6 +12,10 @@ var TSOS;
                 throw new Error("Program larger than 256 bytes.");
             }
             var partition = _MemoryManager.getPartition();
+            if (partition == null) {
+                throw new Error("Out of memory.");
+                return;
+            }
             _MemoryManager.loadProgram(opCodes, partition);
             var pcb = new TSOS.ProcessControlBlock();
             pcb.PID = this.nextPID;
