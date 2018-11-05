@@ -28,6 +28,7 @@ var TSOS;
                     this.partitions[i].free = true;
                 }
             }
+            TSOS.Control.updateMemoryDisplay();
         };
         MemoryManager.prototype.loadProgram = function (opCodes, partition) {
             var start = partition * 256;

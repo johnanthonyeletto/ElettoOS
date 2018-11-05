@@ -30,6 +30,7 @@ module TSOS {
             pcb.PID = this.nextPID;
             pcb.Partition = partition;
 
+            console.log(pcb.Partition);
             this.residentQueue.enqueue(pcb);
 
             this.nextPID++;
@@ -60,10 +61,10 @@ module TSOS {
 
             foundProcess.State = "Ready";
             this.readyQueue.enqueue(foundProcess);
-            this.updateRunning(foundProcess);
-            _CPU.isExecuting = true;
-
             TSOS.Control.updateProcessDisplay();
+            this.next();
+
+            
         }
 
         public updateRunning(process): void {
@@ -119,6 +120,23 @@ module TSOS {
                     this.readyQueue.enqueue(currentProcess);
                 }
             }
+        }
+
+        public next(): void {
+            if(this.readyQueue.getSize() > 0){
+                this.updateRunning(this.readyQueue.dequeue());
+                _CPU.isExecuting = true;
+            } else {
+                _CPU.isExecuting = false;
+            }
+
+            TSOS.Control.updateProcessDisplay();
+        }
+
+        public brkSysCall(): void {
+            _MemoryManager.clearPartition(this.running.Partition);
+            this.running = null;
+            this.next();
         }
     }
 }

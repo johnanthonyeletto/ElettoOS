@@ -211,7 +211,7 @@ module TSOS {
                 cell.innerHTML = _ProcessManager.running.PID;
 
                 cell = row.insertCell();
-                cell.innerHTML = "1";
+                cell.innerHTML = _ProcessManager.running.Partition;
 
                 cell = row.insertCell();
                 cell.innerHTML = _ProcessManager.running.PC;
@@ -246,7 +246,7 @@ module TSOS {
                 cell.innerHTML = currentProcess.PID;
 
                 cell = row.insertCell();
-                cell.innerHTML = "1";
+                cell.innerHTML = currentProcess.Partition;
 
                 cell = row.insertCell();
                 cell.innerHTML = currentProcess.PC;
@@ -283,7 +283,7 @@ module TSOS {
                 cell.innerHTML = currentProcess.PID;
 
                 cell = row.insertCell();
-                cell.innerHTML = "1";
+                cell.innerHTML = currentProcess.Partition;
 
                 cell = row.insertCell();
                 cell.innerHTML = currentProcess.PC;

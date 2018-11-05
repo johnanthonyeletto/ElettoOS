@@ -146,6 +146,7 @@ var TSOS;
         Cpu.prototype.brk = function () {
             //Break (which is really a system call) 00 BRK 00 00
             this.isExecuting = false;
+            _KernelInterruptQueue.enqueue(new TSOS.Interrupt(CPU_BRK_IRQ, null));
             return;
         };
         Cpu.prototype.cpx = function () {

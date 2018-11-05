@@ -20,6 +20,7 @@ var TSOS;
             var pcb = new TSOS.ProcessControlBlock();
             pcb.PID = this.nextPID;
             pcb.Partition = partition;
+            console.log(pcb.Partition);
             this.residentQueue.enqueue(pcb);
             this.nextPID++;
             TSOS.Control.updateProcessDisplay();
@@ -44,9 +45,8 @@ var TSOS;
             }
             foundProcess.State = "Ready";
             this.readyQueue.enqueue(foundProcess);
-            this.updateRunning(foundProcess);
-            _CPU.isExecuting = true;
             TSOS.Control.updateProcessDisplay();
+            this.next();
         };
         ProcessManager.prototype.updateRunning = function (process) {
             // Save state of current running process and put it back on the ready queue.
@@ -97,6 +97,21 @@ var TSOS;
                     this.readyQueue.enqueue(currentProcess);
                 }
             }
+        };
+        ProcessManager.prototype.next = function () {
+            if (this.readyQueue.getSize() > 0) {
+                this.updateRunning(this.readyQueue.dequeue());
+                _CPU.isExecuting = true;
+            }
+            else {
+                _CPU.isExecuting = false;
+            }
+            TSOS.Control.updateProcessDisplay();
+        };
+        ProcessManager.prototype.brkSysCall = function () {
+            _MemoryManager.clearPartition(this.running.Partition);
+            this.running = null;
+            this.next();
         };
         return ProcessManager;
     }());

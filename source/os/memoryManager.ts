@@ -33,6 +33,8 @@ module TSOS {
                     this.partitions[i].free = true;
                 }
             }
+
+            TSOS.Control.updateMemoryDisplay();
         }
 
         public loadProgram(opCodes, partition): void {

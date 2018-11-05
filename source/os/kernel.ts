@@ -129,6 +129,10 @@ module TSOS {
                     _krnKeyboardDriver.isr(params);   // Kernel mode device driver
                     _StdIn.handleInput();
                     break;
+                case CPU_BRK_IRQ:
+                console.log("yuh");
+                    _ProcessManager.brkSysCall();
+                    break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
             }
