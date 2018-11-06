@@ -139,6 +139,12 @@ module TSOS {
                 " - Runs all processes.");
             this.commandList[this.commandList.length] = sc;
 
+            // quantum
+            sc = new ShellCommand(this.shellQuantum,
+                "quantum",
+                "<value> - sets the round robin quantum.");
+            this.commandList[this.commandList.length] = sc;
+
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
 
@@ -514,12 +520,25 @@ module TSOS {
             }
         }
 
-        public shellRunAll(args){
+        public shellRunAll(args) {
             if (args.length > 0) {
                 _StdOut.putText("Usage: ps - ps does not take any args.");
             }
             else {
                 _ProcessManager.runAll();
+            }
+        }
+
+        public shellQuantum(args) {
+            if (args.length != 1) {
+                _StdOut.putText("Usage: quantum <value> - quantum expects one argument.");
+                return;
+            } else if (args[0] < 1) {
+                _StdOut.putText("Quantum must be >= 1");
+                return;
+            } else {
+                _Scheduler.quantum = args[0];
+                _StdOut.putText("Quantum set to " + args[0]);
             }
         }
     }
