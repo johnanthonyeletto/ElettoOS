@@ -202,14 +202,9 @@ module TSOS {
             if (this.Zflag == 0) {
                 this.PC = (this.PC + (branch + 2)) % (256 * (_ProcessManager.running.Partition + 1));
 
-                // if (this.PC < (_ProcessManager.running.Partition * 265) || this.PC > (_ProcessManager.running.Partition * 255)) {
-                //     this.PC += (_ProcessManager.running.Partition * 256);
-                //     console.log("BNE:" + this.PC + " Partition: " + _ProcessManager.running.Partition);
-                // }
 
                 this.PC = parseInt(_MemoryAccessor.translate(this.PC.toString(16)), 16);
 
-                console.log("BNE:" + this.PC + " Partition: " + _ProcessManager.running.Partition);
             } else {
                 this.PC += 2;
             }
@@ -237,12 +232,9 @@ module TSOS {
                 _StdOut.putText(this.Yreg.toString() + " ");
             } else {
                 var address = this.Yreg.toString(16);
-                console.log(address);
                 address = _MemoryAccessor.translate(address);
-                console.log(address);
                 var string = "";
                 while (_MemoryAccessor.read(address) != "00") {
-                    console.log(address);
                     var dec = parseInt(_MemoryAccessor.read(address), 16);
                     string += String.fromCharCode(dec);
 
