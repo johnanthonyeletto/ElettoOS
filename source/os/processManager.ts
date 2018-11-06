@@ -112,7 +112,6 @@ module TSOS {
                 this.running.location = "Memory";
                 this.readyQueue.enqueue(this.running);
             }
-            console.log(process);
             // Start running new process;
             this.running = process;
             this.running.State = "Running";
