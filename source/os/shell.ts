@@ -145,6 +145,12 @@ module TSOS {
                 "<value> - sets the round robin quantum.");
             this.commandList[this.commandList.length] = sc;
 
+            // kill
+            sc = new ShellCommand(this.shellKill,
+                "kill",
+                "<pid> - kills a process with a specified pid.");
+            this.commandList[this.commandList.length] = sc;
+
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
 
@@ -539,6 +545,20 @@ module TSOS {
             } else {
                 _Scheduler.quantum = args[0];
                 _StdOut.putText("Quantum set to " + args[0]);
+            }
+        }
+
+        public shellKill(args) {
+            if (args.length != 1) {
+                _StdOut.putText("Usage: kill <pid> - kill expects one argument.");
+                return;
+            } else {
+                try {
+                    _ProcessManager.killProcess(args[0]);
+                    _StdOut.putText("Process killed.");
+                } catch (error) {
+                    _StdOut.putText(error.message);
+                }
             }
         }
     }

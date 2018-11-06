@@ -41,6 +41,34 @@ module TSOS {
 
         }
 
+        public killProcess(pid): void {
+            if (this.residentQueue[pid] != null) {
+                this.residentQueue[pid] = null;
+                return;
+            } else if (this.running != null && this.running.PID == pid) {
+                this.brkSysCall();
+                this.next();
+                return;
+            }
+
+            var found = false;
+            for (var i = 0; i < this.readyQueue.getSize(); i++) {
+                var currentProcess = this.readyQueue.dequeue();
+
+                if (currentProcess.PID != pid) {
+                    this.readyQueue.enqueue(currentProcess);
+                } else {
+                    found = true;
+                }
+            }
+
+            if (!found) {
+                throw new Error("No process was found with PID " + pid);
+            }
+
+            TSOS.Control.updateProcessDisplay();
+        }
+
         public runAll(): void {
             for (var i = 0; i < this.residentQueue.length; i++) {
                 if (this.residentQueue[i] != null) {
