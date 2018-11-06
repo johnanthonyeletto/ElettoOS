@@ -204,8 +204,11 @@ var TSOS;
                 cell.innerHTML = currentProcess.Location;
                 _ProcessManager.readyQueue.enqueue(currentProcess);
             }
-            for (var i = 0; i < _ProcessManager.residentQueue.getSize(); i++) {
-                var currentProcess = _ProcessManager.residentQueue.dequeue();
+            for (var i = 0; i < _ProcessManager.residentQueue.length; i++) {
+                var currentProcess = _ProcessManager.residentQueue[i];
+                if (currentProcess == null) {
+                    continue;
+                }
                 var row = table.insertRow();
                 var cell;
                 cell = row.insertCell();
@@ -226,7 +229,7 @@ var TSOS;
                 cell.innerHTML = currentProcess.State;
                 cell = row.insertCell();
                 cell.innerHTML = currentProcess.Location;
-                _ProcessManager.residentQueue.enqueue(currentProcess);
+                //_ProcessManager.residentQueue.enqueue(currentProcess);
             }
         };
         return Control;

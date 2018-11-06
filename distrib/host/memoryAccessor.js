@@ -11,6 +11,12 @@ var TSOS;
             _Memory.memoryArray[parseInt(address, 16)] = value;
             TSOS.Control.updateMemoryDisplay();
         };
+        MemoryAccessor.prototype.translate = function (address) {
+            var addressInt = parseInt(address, 16);
+            addressInt = addressInt % 256;
+            var result = addressInt + (_ProcessManager.running.Partition * 256);
+            return (result).toString(16);
+        };
         return MemoryAccessor;
     }());
     TSOS.MemoryAccessor = MemoryAccessor;

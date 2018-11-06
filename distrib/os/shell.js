@@ -98,6 +98,9 @@ var TSOS;
             // ps
             sc = new TSOS.ShellCommand(this.shellPS, "ps", " - Displays a list of processes.");
             this.commandList[this.commandList.length] = sc;
+            // runall
+            sc = new TSOS.ShellCommand(this.shellRunAll, "runall", " - Runs all processes.");
+            this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
             //
@@ -418,6 +421,14 @@ var TSOS;
                     _StdOut.advanceLine();
                     _ProcessManager.residentQueue.enqueue(currentProcess);
                 }
+            }
+        };
+        Shell.prototype.shellRunAll = function (args) {
+            if (args.length > 0) {
+                _StdOut.putText("Usage: ps - ps does not take any args.");
+            }
+            else {
+                _ProcessManager.runAll();
             }
         };
         return Shell;

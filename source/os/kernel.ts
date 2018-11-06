@@ -47,6 +47,7 @@ module TSOS {
 
             _MemoryManager = new MemoryManager();
             _ProcessManager = new ProcessManager();
+            _Scheduler = new Scheduler();
 
             // Enable the OS Interrupts.  (Not the CPU clock interrupt, as that is done in the hardware sim.)
             this.krnTrace("Enabling the interrupts.");
@@ -91,6 +92,7 @@ module TSOS {
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
             } else if (_CPU.isExecuting) { // If there are no interrupts then run one CPU cycle if there is anything being processed. {
                 _CPU.cycle();
+                _Scheduler.schedule();
             } else {                      // If there are no interrupts and there is nothing being executed then just be idle. {
                 this.krnTrace("Idle");
             }
@@ -130,7 +132,6 @@ module TSOS {
                     _StdIn.handleInput();
                     break;
                 case CPU_BRK_IRQ:
-                console.log("yuh");
                     _ProcessManager.brkSysCall();
                     break;
                 default:

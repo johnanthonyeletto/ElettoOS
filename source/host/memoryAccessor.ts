@@ -13,5 +13,15 @@ module TSOS {
             _Memory.memoryArray[parseInt(address, 16)] = value;
             TSOS.Control.updateMemoryDisplay();
         }
+
+        public translate(address): string {
+            var addressInt = parseInt(address, 16);
+
+            addressInt = addressInt % 256;
+
+            var result = addressInt + (_ProcessManager.running.Partition * 256);
+
+            return (result).toString(16);
+        }
     }
 }

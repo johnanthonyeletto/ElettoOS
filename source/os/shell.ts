@@ -133,6 +133,12 @@ module TSOS {
                 " - Displays a list of processes.");
             this.commandList[this.commandList.length] = sc;
 
+            // runall
+            sc = new ShellCommand(this.shellRunAll,
+                "runall",
+                " - Runs all processes.");
+            this.commandList[this.commandList.length] = sc;
+
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
 
@@ -505,6 +511,15 @@ module TSOS {
                     _ProcessManager.residentQueue.enqueue(currentProcess);
 
                 }
+            }
+        }
+
+        public shellRunAll(args){
+            if (args.length > 0) {
+                _StdOut.putText("Usage: ps - ps does not take any args.");
+            }
+            else {
+                _ProcessManager.runAll();
             }
         }
     }

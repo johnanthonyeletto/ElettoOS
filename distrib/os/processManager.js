@@ -3,7 +3,7 @@ var TSOS;
 (function (TSOS) {
     var ProcessManager = /** @class */ (function () {
         function ProcessManager() {
-            this.residentQueue = new TSOS.Queue();
+            this.residentQueue = [];
             this.readyQueue = new TSOS.Queue();
             this.nextPID = 0;
         }
@@ -20,35 +20,36 @@ var TSOS;
             var pcb = new TSOS.ProcessControlBlock();
             pcb.PID = this.nextPID;
             pcb.Partition = partition;
-            console.log(pcb.Partition);
-            this.residentQueue.enqueue(pcb);
+            pcb.PC = partition * 256;
+            this.residentQueue[pcb.PID] = pcb;
             this.nextPID++;
             TSOS.Control.updateProcessDisplay();
             return pcb;
         };
-        ProcessManager.prototype.runProcess = function (pid) {
-            var foundProcess = null;
-            for (var i = 0; i < this.residentQueue.getSize(); i++) {
-                var currentProcess = this.residentQueue.dequeue();
-                if (currentProcess.PID == pid) {
-                    // Process Was Found
-                    foundProcess = currentProcess;
-                }
-                else {
-                    // This is not our dinosaur
-                    this.readyQueue.enqueue(currentProcess);
+        ProcessManager.prototype.runAll = function () {
+            for (var i = 0; i < this.residentQueue.length; i++) {
+                if (this.residentQueue[i] != null) {
+                    this.readyQueue.enqueue(this.residentQueue[i]);
+                    this.residentQueue[i] = null;
                 }
             }
+            TSOS.Control.updateProcessDisplay();
+            this.next();
+        };
+        ProcessManager.prototype.runProcess = function (pid) {
+            var foundProcess = this.residentQueue[pid];
             if (foundProcess == null) {
                 throw new Error("No process was found with PID " + pid);
                 return;
             }
             foundProcess.State = "Ready";
             this.readyQueue.enqueue(foundProcess);
+            this.residentQueue[pid] = null;
             TSOS.Control.updateProcessDisplay();
             this.next();
         };
         ProcessManager.prototype.updateRunning = function (process) {
+            _CPU.isExecuting = false;
             // Save state of current running process and put it back on the ready queue.
             if (this.running != null) {
                 this.running.PC = _CPU.PC;
@@ -61,6 +62,7 @@ var TSOS;
                 this.running.location = "Memory";
                 this.readyQueue.enqueue(this.running);
             }
+            console.log(process);
             // Start running new process;
             this.running = process;
             this.running.State = "Running";
@@ -71,37 +73,13 @@ var TSOS;
             _CPU.Yreg = process.Yreg;
             _CPU.Zflag = process.Zflag;
             _CPU.IR = process.IR;
-            this.removeFromReadyQueue(this.running);
+            this.readyQueue[process.PID] = null;
+            _CPU.isExecuting = true;
             TSOS.Control.updateProcessDisplay();
-        };
-        ProcessManager.prototype.removeFromResidentQueue = function (process) {
-            for (var i = 0; i < this.residentQueue.getSize(); i++) {
-                var currentProcess = this.residentQueue.dequeue();
-                if (currentProcess.PID == process.pid) {
-                    continue;
-                }
-                else {
-                    // This is not our dinosaur
-                    this.residentQueue.enqueue(currentProcess);
-                }
-            }
-        };
-        ProcessManager.prototype.removeFromReadyQueue = function (process) {
-            for (var i = 0; i < this.readyQueue.getSize(); i++) {
-                var currentProcess = this.readyQueue.dequeue();
-                if (currentProcess.PID == process.pid) {
-                    continue;
-                }
-                else {
-                    // This is not our dinosaur
-                    this.readyQueue.enqueue(currentProcess);
-                }
-            }
         };
         ProcessManager.prototype.next = function () {
             if (this.readyQueue.getSize() > 0) {
                 this.updateRunning(this.readyQueue.dequeue());
-                _CPU.isExecuting = true;
             }
             else {
                 _CPU.isExecuting = false;
@@ -109,7 +87,15 @@ var TSOS;
             TSOS.Control.updateProcessDisplay();
         };
         ProcessManager.prototype.brkSysCall = function () {
+            _CPU.isExecuting = false;
             _MemoryManager.clearPartition(this.running.Partition);
+            _CPU.PC = 0;
+            _CPU.IR = "00";
+            _CPU.Acc = 0;
+            _CPU.Xreg = 0;
+            _CPU.Yreg = 0;
+            _CPU.Zflag = 0;
+            TSOS.Control.updateCPUDisplay();
             this.running = null;
             this.next();
         };

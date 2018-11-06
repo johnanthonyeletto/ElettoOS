@@ -43,6 +43,7 @@ module TSOS {
         public cycle(): void {
             _Kernel.krnTrace('CPU cycle');
 
+            //this.PC = parseInt(_MemoryAccessor.translate(this.PC.toString(16)), 16);
             this.IR = _MemoryAccessor.read(this.PC.toString(16));
             switch (this.IR) {
                 case "A9":
@@ -106,6 +107,7 @@ module TSOS {
         private ldaMemory(): void {
             //Load the accumulator from memory AD LDA LDA $0010 AD 10 00
             var memoryAddress = _MemoryAccessor.read((this.PC + 2).toString(16)) + _MemoryAccessor.read((this.PC + 1).toString(16));
+            memoryAddress = _MemoryAccessor.translate(memoryAddress);
 
             this.Acc = parseInt(_MemoryAccessor.read(memoryAddress), 16);
 
@@ -115,6 +117,8 @@ module TSOS {
         private sta(): void {
             //Store the accumulator in memory 8D STA STA $0010 8D 10 00
             var memoryAddress = _MemoryAccessor.read((this.PC + 2).toString(16)) + _MemoryAccessor.read((this.PC + 1).toString(16));
+            memoryAddress = _MemoryAccessor.translate(memoryAddress);
+
             _MemoryAccessor.write(memoryAddress, this.Acc.toString(16));
             this.PC += 3;
         }
@@ -125,6 +129,7 @@ module TSOS {
             //the contents of the accumulator and
             //keeps the result in the accumulator
             var memoryAddress = _MemoryAccessor.read((this.PC + 2).toString(16)) + _MemoryAccessor.read((this.PC + 1).toString(16));
+            memoryAddress = _MemoryAccessor.translate(memoryAddress);
 
             this.Acc += parseInt(_MemoryAccessor.read(memoryAddress), 16);
             this.PC += 3;
@@ -140,6 +145,7 @@ module TSOS {
             //Load the X register from memory AE LDX LDX $0010 AE 10 00
 
             var memoryAddress = _MemoryAccessor.read((this.PC + 2).toString(16)) + _MemoryAccessor.read((this.PC + 1).toString(16));
+            memoryAddress = _MemoryAccessor.translate(memoryAddress);
 
             this.Xreg = parseInt(_MemoryAccessor.read(memoryAddress), 16);
             this.PC += 3;
@@ -154,6 +160,7 @@ module TSOS {
         private ldyMemory(): void {
             //Load the Y register from memory AC LDY LDY $0010 AC 10 00
             var memoryAddress = _MemoryAccessor.read((this.PC + 2).toString(16)) + _MemoryAccessor.read((this.PC + 1).toString(16));
+            memoryAddress = _MemoryAccessor.translate(memoryAddress);
 
             this.Yreg = parseInt(_MemoryAccessor.read(memoryAddress), 16);
             this.PC += 3;
@@ -175,6 +182,8 @@ module TSOS {
             //Compare a byte in memory to the X reg EC CPX EC $0010 EC 10 00
             //Sets the Z (zero) flag if equal
             var memoryAddress = _MemoryAccessor.read((this.PC + 2).toString(16)) + _MemoryAccessor.read((this.PC + 1).toString(16));
+            memoryAddress = _MemoryAccessor.translate(memoryAddress);
+
             var memoryValue = parseInt(_MemoryAccessor.read(memoryAddress), 16);
 
             if (this.Xreg == memoryValue) {
@@ -189,20 +198,29 @@ module TSOS {
         private bne(): void {
             //Branch n bytes if Z flag = 0 D0 BNE D0 $EF D0 EF
             var branch = parseInt(_MemoryAccessor.read((this.PC + 1).toString(16)), 16);
+
             if (this.Zflag == 0) {
-                this.PC = (this.PC + (branch + 2)) % 256;
+                this.PC = (this.PC + (branch + 2)) % (256 * (_ProcessManager.running.Partition + 1));
+
+                // if (this.PC < (_ProcessManager.running.Partition * 265) || this.PC > (_ProcessManager.running.Partition * 255)) {
+                //     this.PC += (_ProcessManager.running.Partition * 256);
+                //     console.log("BNE:" + this.PC + " Partition: " + _ProcessManager.running.Partition);
+                // }
+
+                this.PC = parseInt(_MemoryAccessor.translate(this.PC.toString(16)), 16);
+
+                console.log("BNE:" + this.PC + " Partition: " + _ProcessManager.running.Partition);
             } else {
                 this.PC += 2;
             }
 
-            console.log(branch);
 
         }
 
         private inc(): void {
             //Increment the value of a byte EE INC EE $0021 EE 21 00
             var memoryAddress = _MemoryAccessor.read((this.PC + 2).toString(16)) + _MemoryAccessor.read((this.PC + 1).toString(16));
-
+            memoryAddress = _MemoryAccessor.translate(memoryAddress);
             var value = parseInt(_MemoryAccessor.read(memoryAddress));
 
             _MemoryAccessor.write(memoryAddress, (value + 1).toString(16));
@@ -218,13 +236,18 @@ module TSOS {
             if (this.Xreg == 1) {
                 _StdOut.putText(this.Yreg.toString() + " ");
             } else {
-                var address = this.Yreg;
+                var address = this.Yreg.toString(16);
+                console.log(address);
+                address = _MemoryAccessor.translate(address);
+                console.log(address);
                 var string = "";
-                while (_MemoryAccessor.read(address.toString(16)) != "00") {
-
-                    var dec = parseInt(_MemoryAccessor.read(address.toString(16)), 16);
+                while (_MemoryAccessor.read(address) != "00") {
+                    console.log(address);
+                    var dec = parseInt(_MemoryAccessor.read(address), 16);
                     string += String.fromCharCode(dec);
-                    address++;
+
+
+                    address = (parseInt(address, 16) + 1).toString(16);
                 }
 
                 _StdOut.putText(string + " ");
