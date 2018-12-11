@@ -37,6 +37,20 @@ module TSOS {
             var isShifted = params[1];
             _Kernel.krnTrace("Key code:" + keyCode + " shifted:" + isShifted);
             var chr = "";
+
+            if (keyCode == 222 && isShifted) {
+                chr = "\"";
+                _KernelInputQueue.enqueue(chr);
+                return;
+            }
+
+            if (keyCode == 189) {
+                chr = "-";
+                _KernelInputQueue.enqueue(chr);
+                return;
+            }
+
+
             // Check to see if we even want to deal with the key that was pressed.
             if (((keyCode >= 65) && (keyCode <= 90)) ||   // A..Z
                 ((keyCode >= 97) && (keyCode <= 123))) {  // a..z {

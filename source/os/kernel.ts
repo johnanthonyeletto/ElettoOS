@@ -44,6 +44,10 @@ module TSOS {
             //
             // ... more?
             //
+            this.krnTrace("Loading the disk device driver");
+            _krnDiskDriver = new DeviceDriverDisk();
+            _krnDiskDriver.driverEntry();
+            this.krnTrace(_krnDiskDriver.status);
 
             _MemoryManager = new MemoryManager();
             _ProcessManager = new ProcessManager();

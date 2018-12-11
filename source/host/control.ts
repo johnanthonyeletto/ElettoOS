@@ -101,14 +101,18 @@ module TSOS {
 
             _MemoryAccessor = new MemoryAccessor();
 
+            _Disk = new Disk();
+            _Disk.init();
+
             // ... then set the host clock pulse ...
-            _hardwareClockID = setInterval(Devices.hostClockPulse, CPU_CLOCK_INTERVAL);
+            _hardwareClockID = window.setInterval(Devices.hostClockPulse, CPU_CLOCK_INTERVAL);
             // .. and call the OS Kernel Bootstrap routine.
             _Kernel = new Kernel();
             _Kernel.krnBootstrap();  // _GLaDOS.afterStartup() will get called in there, if configured.
 
             TSOS.Control.updateMemoryDisplay();
             TSOS.Control.updateCPUDisplay();
+            TSOS.Control.updateDiskDisplay();
         }
 
         public static hostBtnHaltOS_click(btn): void {
@@ -174,22 +178,22 @@ module TSOS {
             var cell;
 
             cell = row.insertCell();
-            cell.innerHTML = _CPU.PC.toString(16).toUpperCase();
+            cell.innerHTML = _CPU.PC.toString(16).toUpperCase() || "00";
 
             cell = row.insertCell();
-            cell.innerHTML = _CPU.IR;
+            cell.innerHTML = _CPU.IR || "00";
 
             cell = row.insertCell();
-            cell.innerHTML = _CPU.Acc;
+            cell.innerHTML = _CPU.Acc || "00";
 
             cell = row.insertCell();
-            cell.innerHTML = _CPU.Xreg;
+            cell.innerHTML = _CPU.Xreg || "00";
 
             cell = row.insertCell();
-            cell.innerHTML = _CPU.Yreg;
+            cell.innerHTML = _CPU.Yreg || "00";
 
             cell = row.insertCell();
-            cell.innerHTML = _CPU.Zflag;
+            cell.innerHTML = _CPU.Zflag || "00";
         }
 
         public static updateProcessDisplay(): void {
@@ -208,31 +212,31 @@ module TSOS {
                 var cell;
 
                 cell = row.insertCell();
-                cell.innerHTML = _ProcessManager.running.PID;
+                cell.innerHTML = _ProcessManager.running.PID || "00";
 
                 cell = row.insertCell();
-                cell.innerHTML = _ProcessManager.running.Partition;
+                cell.innerHTML = _ProcessManager.running.Partition || "00";
 
                 cell = row.insertCell();
-                cell.innerHTML = _ProcessManager.running.PC;
+                cell.innerHTML = _ProcessManager.running.PC || "00";
 
                 cell = row.insertCell();
-                cell.innerHTML = _ProcessManager.running.Acc;
+                cell.innerHTML = _ProcessManager.running.Acc || "00";
 
                 cell = row.insertCell();
-                cell.innerHTML = _ProcessManager.running.Xreg;
+                cell.innerHTML = _ProcessManager.running.Xreg || "00";
 
                 cell = row.insertCell();
-                cell.innerHTML = _ProcessManager.running.Yreg;
+                cell.innerHTML = _ProcessManager.running.Yreg || "00";
 
                 cell = row.insertCell();
-                cell.innerHTML = _ProcessManager.running.Zflag;
+                cell.innerHTML = _ProcessManager.running.Zflag || "00";
 
                 cell = row.insertCell();
-                cell.innerHTML = _ProcessManager.running.State;
+                cell.innerHTML = _ProcessManager.running.State || "00";
 
                 cell = row.insertCell();
-                cell.innerHTML = _ProcessManager.running.Location;
+                cell.innerHTML = _ProcessManager.running.Location || "00";
             }
 
             for (var i = 0; i < _ProcessManager.readyQueue.getSize(); i++) {
@@ -243,25 +247,25 @@ module TSOS {
                 var cell;
 
                 cell = row.insertCell();
-                cell.innerHTML = currentProcess.PID;
+                cell.innerHTML = currentProcess.PID || "00";
 
                 cell = row.insertCell();
-                cell.innerHTML = currentProcess.Partition;
+                cell.innerHTML = currentProcess.Partition || "00";
 
                 cell = row.insertCell();
-                cell.innerHTML = currentProcess.PC;
+                cell.innerHTML = currentProcess.PC || "00";
 
                 cell = row.insertCell();
-                cell.innerHTML = currentProcess.Acc;
+                cell.innerHTML = currentProcess.Acc || "00";
 
                 cell = row.insertCell();
-                cell.innerHTML = currentProcess.Xreg;
+                cell.innerHTML = currentProcess.Xreg || "00";
 
                 cell = row.insertCell();
-                cell.innerHTML = currentProcess.Yreg;
+                cell.innerHTML = currentProcess.Yreg || "00";
 
                 cell = row.insertCell();
-                cell.innerHTML = currentProcess.Zflag;
+                cell.innerHTML = currentProcess.Zflag || "00";
 
                 cell = row.insertCell();
                 cell.innerHTML = currentProcess.State;
@@ -284,25 +288,25 @@ module TSOS {
                 var cell;
 
                 cell = row.insertCell();
-                cell.innerHTML = currentProcess.PID;
+                cell.innerHTML = currentProcess.PID || "00";
 
                 cell = row.insertCell();
-                cell.innerHTML = currentProcess.Partition;
+                cell.innerHTML = currentProcess.Partition || "00";
 
                 cell = row.insertCell();
-                cell.innerHTML = currentProcess.PC;
+                cell.innerHTML = currentProcess.PC || "00";
 
                 cell = row.insertCell();
-                cell.innerHTML = currentProcess.Acc;
+                cell.innerHTML = currentProcess.Acc || "00";
 
                 cell = row.insertCell();
-                cell.innerHTML = currentProcess.Xreg;
+                cell.innerHTML = currentProcess.Xreg || "00";
 
                 cell = row.insertCell();
-                cell.innerHTML = currentProcess.Yreg;
+                cell.innerHTML = currentProcess.Yreg || "00";
 
                 cell = row.insertCell();
-                cell.innerHTML = currentProcess.Zflag;
+                cell.innerHTML = currentProcess.Zflag || "00";
 
                 cell = row.insertCell();
                 cell.innerHTML = currentProcess.State;
@@ -311,6 +315,36 @@ module TSOS {
                 cell.innerHTML = currentProcess.Location;
 
                 //_ProcessManager.residentQueue.enqueue(currentProcess);
+            }
+        }
+
+        public static updateDiskDisplay(): void {
+            var table = (<HTMLTableElement>document.getElementById('tableDisk'));
+
+            // delete all rows in table
+            for (var i = 0; i < table.rows.length; i++) {
+                table.deleteRow(0);
+            }
+        
+            var currentRow = 0;
+            for (var trackNum = 0; trackNum < _Disk.totalTracks; trackNum++) {
+                for (var sectorNum = 0; sectorNum < _Disk.totalSectors; sectorNum++) {
+                    for (var blockNum = 0; blockNum < _Disk.totalBlocks; blockNum++) {
+
+                        var tsbID = trackNum + ":" + sectorNum + ":" + blockNum;
+                        var row = table.insertRow(currentRow);
+                        currentRow++;
+                        var tsb = row.insertCell(0);
+                        tsb.innerHTML = tsbID;
+                        var availableBit = row.insertCell(1);
+                        availableBit.innerHTML = (JSON.parse(sessionStorage.getItem(tsbID)).inUse) ? "1" : "0";
+                        var pointer = row.insertCell(2);
+                        var pointerVal = JSON.parse(sessionStorage.getItem(tsbID)).pointer;
+                        pointer.innerHTML = pointerVal;
+                        var data = row.insertCell(3);
+                        data.innerHTML = JSON.parse(sessionStorage.getItem(tsbID)).data.join("").toString();
+                    }
+                }
             }
         }
     }

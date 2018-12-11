@@ -33,6 +33,31 @@ module TSOS {
             return retVal;
         }
 
+        public getHighestPriority() {
+            if (this.q.length <= 0) {
+                return null;
+            }
+            var highestPriority = this.q[0].Priority || Number.MAX_VALUE;
+            var highestPriorityProcess = this.q[0];
+            var highestPriorityIndex = 0;
+            for (var i = 0; i < this.q.length; i++) {
+                if (this.q[i].Priority < highestPriority) {
+                    highestPriorityProcess = this.q[i];
+                    highestPriority = this.q[i].Priority;
+                    highestPriorityIndex = i;
+                }
+            }
+
+            this.q[highestPriorityIndex] = null;
+
+            // Remove any nulls left in array.
+            this.q.filter(function (el) {
+                return el != null;
+            });
+
+            return highestPriorityProcess;
+        }
+
         public peek(index) {
             return this.q[index];
         }

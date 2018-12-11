@@ -23,6 +23,14 @@ const KEYBOARD_IRQ: number = 1;
 const CPU_BRK_IRQ: number = 2;
 
 
+// Scheduleing algorithms.
+const ROUND_ROBIN = 0;
+const FCFS = 1;
+const PRIORITY = 2;
+
+var SCHEDULING_ALGORITHM = ROUND_ROBIN;
+
+
 //
 // Global Variables
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.
@@ -32,6 +40,8 @@ var _CPU: TSOS.Cpu;  // Utilize TypeScript's type annotation system to ensure th
 var _Memory: TSOS.Memory;
 
 var _MemoryAccessor: TSOS.MemoryAccessor;
+
+var _Disk: TSOS.Disk;
 
 var _OSclock: number = 0;  // Page 23.
 
@@ -69,6 +79,8 @@ var _SarcasticMode: boolean = false;
 
 // Global Device Driver Objects - page 12
 var _krnKeyboardDriver; //  = null;
+var _krnDiskDriver; //  = null;
+
 
 var _hardwareClockID: number = null;
 

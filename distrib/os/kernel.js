@@ -39,6 +39,10 @@ var TSOS;
             //
             // ... more?
             //
+            this.krnTrace("Loading the disk device driver");
+            _krnDiskDriver = new TSOS.DeviceDriverDisk();
+            _krnDiskDriver.driverEntry();
+            this.krnTrace(_krnDiskDriver.status);
             _MemoryManager = new TSOS.MemoryManager();
             _ProcessManager = new TSOS.ProcessManager();
             _Scheduler = new TSOS.Scheduler();

@@ -151,8 +151,54 @@ module TSOS {
                 "<pid> - kills a process with a specified pid.");
             this.commandList[this.commandList.length] = sc;
 
-            // ps  - list the running processes and their IDs
-            // kill <id> - kills the specified process id.
+            // create
+            sc = new ShellCommand(this.shellCreate,
+                "create",
+                "<filename> - creates a file with a specified name");
+            this.commandList[this.commandList.length] = sc;
+
+            // read
+            sc = new ShellCommand(this.shellRead,
+                "read",
+                "<filename> - reads a file with a specified name");
+            this.commandList[this.commandList.length] = sc;
+
+            // write
+            sc = new ShellCommand(this.shellWrite,
+                "write",
+                "<filename> \"data\"- writes to a specific file");
+            this.commandList[this.commandList.length] = sc;
+
+            // delete
+            sc = new ShellCommand(this.shellDelete,
+                "delete",
+                "<filename> \"data\"- deletes a specified file.");
+            this.commandList[this.commandList.length] = sc;
+
+            // format
+            sc = new ShellCommand(this.shellFormat,
+                "format",
+                " - formats the disk");
+            this.commandList[this.commandList.length] = sc;
+
+            // ls
+            sc = new ShellCommand(this.shellLS,
+                "ls",
+                " - lists available files (optional flag '-a')");
+            this.commandList[this.commandList.length] = sc;
+
+            // setschedule
+            sc = new ShellCommand(this.shellSetSchedule,
+                "setschedule",
+                " <algorighm> - sets the scheduling algorithm.");
+            this.commandList[this.commandList.length] = sc;
+
+            // getschedule
+            sc = new ShellCommand(this.shellGetSchedule,
+                "getschedule",
+                " - returns the current scheduleing algorithm.");
+            this.commandList[this.commandList.length] = sc;
+
 
             //
             // Display the initial prompt.
@@ -444,8 +490,8 @@ module TSOS {
         }
 
         public shellLoad(args) {
-            if (args.length > 0) {
-                _StdOut.putText("Usage: load - Load does not take any args.");
+            if (args.length > 1) {
+                _StdOut.putText("Usage: load - Load only takes one optional argument.");
             }
             else {
                 // validate hex
@@ -461,7 +507,7 @@ module TSOS {
                     var commands = input.split(" ");
 
                     try {
-                        var process = _ProcessManager.createProcess(commands);
+                        var process = _ProcessManager.createProcess(commands, ((args[0]) ? args[0] : null));
                         _StdOut.putText("Program loaded. PID - " + process.PID);
                     } catch (error) {
                         _StdOut.putText(error.message);
@@ -559,6 +605,159 @@ module TSOS {
                 } catch (error) {
                     _StdOut.putText(error.message);
                 }
+            }
+        }
+
+        public shellCreate(args) {
+            if (args.length != 1) {
+                _StdOut.putText("Usage: create <filename> - create expects a filename.");
+                return;
+            }
+
+            if (args[0].length > 56) {
+                _StdOut.putText("The file name must be 56 characters or less.");
+                return;
+            }
+
+            let status = _krnDiskDriver.createFile(args[0]);
+            if (status == _krnDiskDriver.SUCCESS) {
+                _StdOut.putText(args[0] + " created successfully.");
+            }
+            else if (status == _krnDiskDriver.FILE_NAME_EXISTS) {
+                _StdOut.putText("File name already exists.");
+            }
+            else if (status == _krnDiskDriver.DISK_FULL) {
+                _StdOut.putText("Could not create " + args[0] + " no more space on disk.");
+            }
+
+        }
+
+        public shellRead(args) {
+            if (args.length != 1) {
+                _StdOut.putText("Usage: read <filename> - read expects a filename.");
+                return;
+            }
+
+            let status = _krnDiskDriver.readFile(args[0]);
+            if (status == _krnDiskDriver.FILE_NAME_NO_EXIST || args[0].includes("$")) {
+                _StdOut.putText(args[0] + " does not exist.");
+                return;
+            }
+            // Print out file
+            _StdOut.putText(status.fileData.join(""));
+        }
+
+        public shellWrite(args) {
+            if (args.length < 2) {
+                _StdOut.putText("Usage: write <filename> \"<text>\"  Please supply a filename and text surrounded by quotes.");
+                return;
+            }
+
+            let data = "";
+            for (var i = 1; i < args.length; i++) {
+                data += args[i] + " ";
+            }
+
+            if (data.charAt(0) != "\"" || data.charAt(data.length - 2) != "\"") {
+                _StdOut.putText("Usage: write <filename> \"<text>\"  Please supply a filename and text surrounded by quotes.");
+                return;
+            }
+
+            data = data.trim();
+
+            let status = _krnDiskDriver.writeToDisk(args[0], data);
+            if (status == _krnDiskDriver.SUCCESS) {
+                _StdOut.putText("Success: wrote to " + args[0]);
+            } else if (status == _krnDiskDriver.FILE_NAME_NO_EXIST) {
+                // Just create the file if it doesn't exist. 
+                // This is like doing: nano <filename>. It still opens a file for you.
+                _OsShell.shellCreate([args[0]]);
+                _OsShell.shellWrite(args);
+            } else if (args[0].includes("$")) {
+                _StdOut.putText(args[0] + " does not exist.");
+            }
+            else if (status == _krnDiskDriver.DISK_FULL) {
+                _StdOut.putText("Unable to write. Not enough disk space.");
+            }
+        }
+
+        public shellDelete(args) {
+            if (args.length != 1) {
+                _StdOut.putText("Usage: delete <filename> - you must provide a filename to delete.");
+                return;
+            }
+
+            if (!args[0].includes("$")) {
+                _krnDiskDriver.deleteFile(args[0]);
+            }
+            _StdOut.putText("Successfully deleted " + args[0]);
+
+
+        }
+
+        public shellFormat(args) {
+            if (args != 0) {
+                _StdOut.putText("Usage: format - format does not take any arguments.");
+            }
+            _krnDiskDriver.formatDisk();
+        }
+
+        public shellLS(args) {
+            var files = _krnDiskDriver.getAllFiles(args[0]);
+
+            for (var i = 0; i < files.length; i++) {
+                _StdOut.putText(files[i] + "  ");
+            }
+        }
+
+        public shellSetSchedule(args) {
+            if (args.length != 1) {
+                _StdOut.putText("Usage: setschedule <algorithm> - set schedule expects exactly one argument..");
+                return;
+            }
+
+            switch (args[0]) {
+                case 'rr':
+                    SCHEDULING_ALGORITHM = ROUND_ROBIN;
+                    _Scheduler.quantum = 6;
+                    _StdOut.putText("Scheule changed to round robin with quantum 6.");
+                    break;
+                case 'fcfs':
+                    SCHEDULING_ALGORITHM = FCFS;
+                    _Scheduler.quantum = 1000;
+                    _StdOut.putText("Scheule changed to first come, first served.");
+                    break;
+                case 'priority':
+                    SCHEDULING_ALGORITHM = PRIORITY;
+                    _Scheduler.quantum = 6;
+                    _StdOut.putText("Scheule changed to priority.");
+                    break;
+                default:
+                    _StdOut.putText(args[0] + " is not a valid scheduleing algorithm.");
+                    break;
+            }
+        }
+
+        public shellGetSchedule(args) {
+            if (args.length > 0) {
+                _StdOut.putText("Usage: getschedule - get schedule does not take any arguments.");
+                return;
+            }
+
+            switch (SCHEDULING_ALGORITHM) {
+                case ROUND_ROBIN:
+                    _StdOut.putText("round robin quantum " + _Scheduler.quantum);
+                    break;
+                case FCFS:
+                    _StdOut.putText("first come, first served");
+                    break;
+                case PRIORITY:
+                    _StdOut.putText("priority.");
+                    break;
+                default:
+                    //  We should never get here
+                    _StdOut.putText("Uh oh, no algorithm set.");
+                    break;
             }
         }
     }

@@ -13,23 +13,27 @@ module TSOS {
             this.nextPID = 0;
         }
 
-        public createProcess(opCodes) {
+        public createProcess(opCodes, priority = 0) {
             if (opCodes.length > 256) {
                 throw new Error("Program larger than 256 bytes.");
             }
 
             var partition = _MemoryManager.getPartition();
+            var swapFile;
             if (partition == null) {
-                throw new Error("Out of memory.");
-                return;
+                swapFile = this.putProcessOnDisk(opCodes, this.nextPID);
+            } else {
+                _MemoryManager.loadProgram(opCodes, partition);
             }
 
-            _MemoryManager.loadProgram(opCodes, partition);
 
             var pcb = new ProcessControlBlock();
             pcb.PID = this.nextPID;
-            pcb.Partition = partition;
-            pcb.PC = partition * 256;
+            pcb.Partition = ((partition == null) ? swapFile : partition);
+            pcb.PC = ((partition == null) ? 0 : (partition * 256));
+            pcb.Location = ((partition == null) ? "Disk" : "Memory");
+            pcb.Priority = priority;
+
 
             this.residentQueue[pcb.PID] = pcb;
 
@@ -101,6 +105,56 @@ module TSOS {
         public updateRunning(process): void {
             _CPU.isExecuting = false;
             // Save state of current running process and put it back on the ready queue.
+
+            if (process.Location == "Disk") {
+
+                // We have to decide which process to swap out.
+                // First let's check if there's sn empty memory segment from a program that has ended already.
+                var partition = _MemoryManager.getPartition();
+                if (partition != null) {
+                    // There's a free partition. Let's put it there.
+                    process = this.moveFromDisk(process, partition);
+                } else {
+                    // There's no partition. We'll make one.
+                    var partitionToMoveTo;
+                    var processToMoveIndex;
+                    if (this.running != null) {
+                        // If there's a process running, it probably won't run again for a while. So let's swap that out.
+                        partitionToMoveTo = this.running.Partition;
+                        this.running = this.moveToDisk(this.running);
+                    } else if (this.residentQueue.length > 0) {
+                        // We'll just go with random from resident queue.
+
+                        for (var i = 0; i < this.residentQueue.length; i++) {
+                            if (this.residentQueue[i] == null) {
+                                continue;
+                            }
+
+                            if (this.residentQueue[i].Location == "Disk") {
+                                continue;
+                            }
+
+                            processToMoveIndex = i;
+                            i = this.residentQueue.lentgh;
+                        }
+
+
+                        partitionToMoveTo = this.residentQueue[processToMoveIndex].Partition;
+                        this.residentQueue[processToMoveIndex] = this.moveToDisk(this.residentQueue[processToMoveIndex]);
+                    } else {
+                        while (this.readyQueue.q[processToMoveIndex].Location == "Disk") {
+                            // We'll just go with random from ready queue.
+                            processToMoveIndex = Math.floor(Math.random() * this.readyQueue.getSize());
+                        }
+
+                        partitionToMoveTo = this.readyQueue.q[processToMoveIndex].Partition;
+                        this.readyQueue.q[processToMoveIndex] = this.moveToDisk(this.readyQueue.q[processToMoveIndex]);
+                    }
+
+                    process = this.moveFromDisk(process, partitionToMoveTo);
+                }
+            }
+
             if (this.running != null) {
                 this.running.PC = _CPU.PC;
                 this.running.ACC = _CPU.Acc;
@@ -116,7 +170,7 @@ module TSOS {
             this.running = process;
             this.running.State = "Running";
             this.running.location = "CPU";
-            _CPU.PC = process.PC;
+            _CPU.PC = process.PC || 0;
             _CPU.Acc = process.ACC;
             _CPU.Xreg = process.Xreg;
             _CPU.Yreg = process.Yreg;
@@ -132,7 +186,12 @@ module TSOS {
 
         public next(): void {
             if (this.readyQueue.getSize() > 0) {
-                this.updateRunning(this.readyQueue.dequeue());
+                if (SCHEDULING_ALGORITHM == PRIORITY) {
+                    this.updateRunning(this.readyQueue.getHighestPriority());
+                } else {
+                    this.updateRunning(this.readyQueue.dequeue());
+                }
+
             } else {
                 _CPU.isExecuting = false;
             }
@@ -152,6 +211,60 @@ module TSOS {
             TSOS.Control.updateCPUDisplay();
             this.running = null;
             this.next();
+        }
+
+
+        private putProcessOnDisk(opCodes, pid) {
+            var filename = "$SWAP" + pid;
+            var result = _krnDiskDriver.createFile(filename);
+            if (result == _krnDiskDriver.DISK_FULL) {
+                _Kernel.krnTrapError("Fatal: Can't swap. Disk full.");
+                return;
+            }
+            var opCodeString = "";
+
+            for (var i = 0; i < opCodes.length; i++) {
+                opCodeString += opCodes[i] + " ";
+            }
+
+
+            _krnDiskDriver.writeToDisk(filename, "\"" + opCodeString + "\"");
+            return filename;
+        }
+
+        private moveToDisk(pcb) {
+            var opCodes = [];
+            for (var i = (pcb.Partition * 256); i < (pcb.Partition * 256) + 256; i++) {
+                var op = _MemoryAccessor.read(i.toString(16));
+                opCodes.push(op);
+            }
+
+            var fileName = this.putProcessOnDisk(opCodes, pcb.PID);
+
+            _MemoryManager.clearPartition(pcb.Partition);
+
+            pcb.Location = "Disk";
+            // Interesting... Divide by zero error found in the wild.
+            pcb.PC = pcb.PC - (pcb.Partition * 256);
+            pcb.Partition = fileName;
+
+
+            return pcb;
+        }
+
+        public moveFromDisk(pcb, partitionToMoveTo) {
+            var filename = "$SWAP" + pcb.PID;
+
+            var opCodes = _krnDiskDriver.readFile(filename).fileData.join("").trim().split(" ");
+
+            _MemoryManager.loadProgram(opCodes, partitionToMoveTo);
+
+            pcb.Location = "Memory";
+            pcb.Partition = partitionToMoveTo;
+            pcb.PC = pcb.PC * partitionToMoveTo;
+
+            _krnDiskDriver.deleteFile(filename);
+            return pcb;
         }
     }
 }

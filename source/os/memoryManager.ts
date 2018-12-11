@@ -42,6 +42,7 @@ module TSOS {
             var end = start + 256;
 
             for (var i = 0; i < opCodes.length; i++) {
+
                 _MemoryAccessor.write((i + start).toString(16), opCodes[i]);
             }
 
